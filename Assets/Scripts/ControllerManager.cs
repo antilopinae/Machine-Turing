@@ -4,39 +4,64 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
-
+using static ControllerManager;
+using Unity.VisualScripting;
 
 public class ControllerManager : MonoBehaviour
 {
     public class Cell
     {
         public static GameObject cells_parent;
-        private GameObject cell_obj_orig;
+        //private GameObject cell_obj_orig;
         private GameObject cell_obj_parent;
-        private string cell_name;
+        private Animator anim;
+        private string cell_name="";
         private float cell_position;
+        private bool cell_visible=false;
         public Cell(string cell_name, GameObject cell_object,float cell_position)
         {
-            this.cell_obj_orig = cell_object.transform.GetChild(0).gameObject;
+            cell_visible=true;
+            //this.cell_obj_orig = cell_object.transform.GetChild(0).gameObject;
             this.cell_obj_parent = cell_object;
             this.cell_position = cell_position;
             this.cell_name = cell_name;
             this.cell_obj_parent.transform.parent = cells_parent.transform;
             this.cell_obj_parent.transform.localPosition = new Vector3(cell_position, 0 ,0);
-            this.cell_obj_orig.transform.GetChild(0).GetComponent<TextMeshPro>().text = this.cell_name;
+            cell_object.transform.GetChild(0).transform.GetChild(0).GetComponent<TextMeshPro>().text = this.cell_name;
+            Animator(true);
+        }
+        public Cell(GameObject cell_object, float cell_position)
+        {
+            this.cell_obj_parent = cell_object;
+            this.cell_position = cell_position;
+            this.cell_obj_parent.transform.parent = cells_parent.transform;
+            this.cell_obj_parent.transform.localPosition = new Vector3(cell_position, 0, 0);
+            cell_object.transform.GetChild(0).transform.GetChild(0).GetComponent<TextMeshPro>().text = this.cell_name;
+            Animator(true);
+        }
+        private void Animator(bool instant)
+        {
+            if (anim==null) anim = cell_obj_parent.transform.GetChild(0).GetComponent<Animator>();
+            if (instant) StateCell = States.cell_instant;
+            else StateCell = States.cell_change;
+        }
+        private States StateCell
+        {
+            get { return (States)anim.GetInteger("state"); }
+            set { anim.SetInteger("state", (int)value); }
         }
     }
-    [SerializeField] private Animator anim;
     [SerializeField] private GameObject[] gameObjects;
     [SerializeField] private Button button;
     [SerializeField] float step;
     private float bound;
+    private const int sizeMap2=200; //%2
     private float x_position=0f;
     public static List<Cell> StageCells= new List<Cell>();
     private bool isGenerated = true;
-    private bool tet_tet = false;
+    private bool counter = false;
     private bool setlevel = false;
-    private int i=0;
+    private int tet_tet; //local counter
     private char namecell;
     public static List<Item> Items;
     private char[] StartWord;
@@ -47,46 +72,14 @@ public class ControllerManager : MonoBehaviour
     {
         bound = gameObjects[0].GetComponentInChildren<MeshFilter>().sharedMesh.bounds.size.x;
         button.onClick.AddListener(() => { AddCell('Y'); });
-        SetLevel(1);
+        SetLevel();
     }
-    private void Update()
+    private void SetLevel()
     {
-        if (isGenerated)
-        {
-            if (setlevel)
-            {
-                if (i < StartWord.Length)
-                {
-                    AddCell(StartWord[i]);
-                    i++;
-                }
-                else { setlevel = false; MainGame.SetLevel = false; }
-                }
-            else{
-                if (tet_tet)
-                {
-                    AddCell(namecell);
-                    tet_tet = false;
-                }
-            }
-
-            void AddCell(char name)
-            {
-                GameObject cell = generateCells(gameObjects[1]);
-                StartCoroutine(IsThisCoordinateY(cell.transform.GetChild(0)));
-                StageCells.Add(new Cell(name.ToString(), cell, x_position));
-                CellAct?.Invoke(x_position);
-                x_position += (bound + step);
-            }
-        }
-        else tet_tet = false;
-    }
-    private void SetLevel(int id)
-    {
-        level_id = id;
+        level_id = 1;
         foreach (Item item in Items)
         {
-            if (item.Id == id)
+            if (item.Id == 1)
             {
                 this.StartWord = item.StartWord.ToCharArray();
                 this.FinishWord = item.FinishWord.ToCharArray();
@@ -94,7 +87,59 @@ public class ControllerManager : MonoBehaviour
         }
         Cell.cells_parent = new GameObject("CellsParent");
         Cell.cells_parent.transform.position = new Vector3(0, 0, 0);
+        x_position = -100 * (bound + step);
+        tet_tet = 0;
         setlevel = true;
+    }
+    private void Update()
+    {
+        if (isGenerated)
+        {
+            if (setlevel)
+            {
+                if (tet_tet <= sizeMap2 + StartWord.Length && (tet_tet <= sizeMap2/2-1 || tet_tet >= sizeMap2/2 + StartWord.Length))
+                {
+                    AddEmptyCell();
+                }
+                else if (tet_tet <= sizeMap2/2 + StartWord.Length)
+                {
+                    AddCell(StartWord[tet_tet - 100]);
+                    Time.timeScale = 1 + Math.Abs(tet_tet - sizeMap2/2) / (sizeMap2/2);
+                }
+                else
+                {
+                    setlevel = false; MainGame.SetLevel = false;
+                    Time.timeScale = 1f;
+                    return;
+                }
+                tet_tet++;
+                x_position += (bound + step);
+            }
+            
+            else{
+                if (counter)
+                {
+                    AddCell(namecell);
+                    counter = false;
+                    x_position += (bound + step);
+                }
+            }
+            void AddEmptyCell()
+            {
+                GameObject cell = generateCells(gameObjects[1]);
+                StartCoroutine(IsThisCoordinateY(cell.transform));
+                StageCells.Add(new Cell(cell,x_position));
+            }
+            void AddCell(char name)
+            {
+                GameObject cell = generateCells(gameObjects[1]);
+                StartCoroutine(IsThisCoordinateY(cell.transform.GetChild(0)));
+                StageCells.Add(new Cell(name.ToString(), cell, x_position));
+                //Debug.Log(cell.transform.GetChild(0).GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("cell_instant"));
+                CellAct?.Invoke(x_position);
+            }
+        }
+        else counter = false;
     }
 
     private GameObject generateCells(GameObject prefab)
@@ -105,9 +150,8 @@ public class ControllerManager : MonoBehaviour
     private void AddCell(char name)
     {
         namecell = name;
-        tet_tet = true;
+        counter = true;
     }
-
 
     IEnumerator IsThisCoordinateY(Transform coordY)
     {
@@ -135,15 +179,11 @@ public class ControllerManager : MonoBehaviour
     public static Action<float> CellAct;
 
 
-    private States StateCell
-    {
-        get { return (States)anim.GetInteger("state"); }
-        set { anim.SetInteger("state", (int)value); }
-    }
+    
 }
 
 public enum States
 {
-    instant,
-    change,
+    cell_instant,
+    cell_change,
 }

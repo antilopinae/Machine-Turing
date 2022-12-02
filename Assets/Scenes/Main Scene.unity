@@ -993,7 +993,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f98610ee72a9f6d4f80c33852d056adc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  anim: {fileID: 0}
   gameObjects:
   - {fileID: 7772713962728655892, guid: 47cf7f1db19acfe4497adcba7266db57, type: 3}
   - {fileID: 7772713962728655892, guid: 47cf7f1db19acfe4497adcba7266db57, type: 3}
@@ -1871,7 +1870,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Items:
   - Id: 1
-    StartWord: ABBA
+    StartWord: ABBBA
     FinishWord: FINISH
     ABC: HGHHAH
   - Id: 2
@@ -2441,6 +2440,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1514181066454835923, guid: 5696d06a4d6151a48815c167f0ef7f4c, type: 3}
+      propertyPath: step
+      value: 1e-12
+      objectReference: {fileID: 0}
     - target: {fileID: 1514181066454835945, guid: 5696d06a4d6151a48815c167f0ef7f4c, type: 3}
       propertyPath: m_Name
       value: MachineHead
@@ -2459,7 +2462,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1514181066454835948, guid: 5696d06a4d6151a48815c167f0ef7f4c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: -1.8
       objectReference: {fileID: 0}
     - target: {fileID: 1514181066454835948, guid: 5696d06a4d6151a48815c167f0ef7f4c, type: 3}
       propertyPath: m_LocalPosition.z

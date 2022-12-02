@@ -14,12 +14,14 @@ public class CellController : MonoBehaviour
     {
         onTouched?.Invoke(collider.gameObject);
     }
-    void Start()
-    {
-
-    }
-
+    private float progress = 0;
+    private bool moving=false;
     private bool start = true;
+    private float x_position;
+    private void Start()
+    {
+        
+    }
     void Update()
     {
         if (MainGame.SetLevel == false && this.start)
@@ -27,11 +29,20 @@ public class CellController : MonoBehaviour
             ControllerManager.Cell.cells_parent.transform.position = new Vector3(0, 0, 0);
             start = false;
         }
+        if (moving)
+        {
+            ControllerManager.Cell.cells_parent.transform.position = Vector3.Lerp(ControllerManager.Cell.cells_parent.transform.position, new Vector3(-x_position, 0, 0), progress);
+            progress += Time.deltaTime;
+            if(progress >= 1) moving= false;
+        }
+        
     }
     private List<ControllerManager.Cell> StageCells;
     private void SlipCell(float x_position)
     {
-        ControllerManager.Cell.cells_parent.transform.position = new Vector3(-x_position, 0, 0);
+        progress = 0f;
+        this.x_position = x_position;
+        moving = true;
     }
     private void OnEnable()
     {
