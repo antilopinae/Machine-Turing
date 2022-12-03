@@ -15,9 +15,9 @@ public class ControllerManager : MonoBehaviour
         //private GameObject cell_obj_orig;
         private GameObject cell_obj_parent;
         private Animator anim;
-        private string cell_name="";
+        private string cell_name = "";
         private float cell_position;
-        private bool cell_visible=false;
+        private bool cell_visible = false;
         public Cell(string cell_name, GameObject cell_object,float cell_position)
         {
             cell_visible=true;
@@ -44,6 +44,7 @@ public class ControllerManager : MonoBehaviour
             if (anim==null) anim = cell_obj_parent.transform.GetChild(0).GetComponent<Animator>();
             if (instant) StateCell = States.cell_instant;
             else StateCell = States.cell_change;
+            Debug.Log(anim.GetCurrentAnimatorStateInfo(0).IsName("cell_instant"));
         }
         public GameObject GetObject()
         {
@@ -126,8 +127,6 @@ public class ControllerManager : MonoBehaviour
                 tet_tet++;
                 x_position += (bound + step);
             }
-
-            
             void AddEmptyCell()
             {
                 GameObject cell = generateCells(gameObjects[1]);
@@ -143,7 +142,6 @@ public class ControllerManager : MonoBehaviour
                 CellAct?.Invoke(x_position);
             }
         }
-        
     }
 
     private GameObject generateCells(GameObject prefab)
@@ -163,12 +161,12 @@ public class ControllerManager : MonoBehaviour
 
     }
     //Controller HeadMachine
-    private Cell InitializeCell(bool visible, GameObject gameObject)
+    private Cell InitializeCell(bool isTextEmpty, GameObject gameObject)
     {
         for (int i=0; i < StageCells.Count; i++)
         {
             Cell cell = StageCells[i];
-            if (!visible || cell.Visible())
+            if (isTextEmpty || cell.Visible())
             {
                 if (gameObject == cell.GetObject())
                 {
@@ -180,7 +178,7 @@ public class ControllerManager : MonoBehaviour
     }
     private void CellHit(GameObject collider)
     {
-        Cell cell = InitializeCell(!(collider.transform.GetChild(0).GetComponent<TextMeshPro>().text == ""), collider);
+        Cell cell = InitializeCell((collider.transform.GetChild(0).GetComponent<TextMeshPro>().text == ""), collider);
         Transform cell_transform = cell.GetObject().transform;
         cell.Animator(false);
         StartCoroutine(IsThisCoordinateY(cell_transform));
@@ -209,4 +207,6 @@ public enum States
 {
     cell_instant,
     cell_change,
+    cell_idle,
+    cell_process
 }

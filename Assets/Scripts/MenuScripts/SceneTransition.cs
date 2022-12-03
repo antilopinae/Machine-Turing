@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class SceneTransition : MonoBehaviour
 {
-
     private static SceneTransition instance;
     private static bool shouldPlayOpeningAnimation = false;
 
