@@ -15,9 +15,9 @@ public class MainGame : MonoBehaviour
     public static bool SetLevel = true;
     private void Start()
     {
-        buttonPause.onClick.AddListener(()=> { ; });
-        buttonOneStep.onClick.AddListener(() => {; });
-        buttonContinue.onClick.AddListener(()=> { ; });
+        buttonPause.onClick.AddListener(()=> { Pause(); });
+        buttonOneStep.onClick.AddListener(() => {OneStep(); });
+        buttonContinue.onClick.AddListener(()=> { Continue(); });
     }
 
     private void OnApplicationPause(bool pause)
@@ -32,7 +32,7 @@ public class MainGame : MonoBehaviour
     {
 
     }
-    private void OneStep(string test)
+    private void OneStep()
     {
 
     }

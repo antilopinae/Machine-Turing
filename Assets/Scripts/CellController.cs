@@ -12,6 +12,7 @@ public class CellController : MonoBehaviour
     public static Action <GameObject>onTouched;
     private void OnTriggerEnter(Collider collider)
     {
+        if (!start)
         onTouched?.Invoke(collider.gameObject);
     }
     private float progress = 0;
@@ -37,7 +38,6 @@ public class CellController : MonoBehaviour
         }
         
     }
-    private List<ControllerManager.Cell> StageCells;
     private void SlipCell(float x_position)
     {
         progress = 0f;
