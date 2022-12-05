@@ -285,7 +285,7 @@ public class StationContent : MonoBehaviour
             Base.state_names = state_names;
             Base.state_types = state_types;
         }
-        public int[] SearchSymbol(string name_state, string name_symbol, int ind_state, int ind_symb)
+        public Table SearchSymbol(string name_state, string name_symbol, int ind_state, int ind_symb)
         {
             List<int> searched_state=new List<int>();
             for (int i = 0; i < state_names.Count; i++)
@@ -305,48 +305,57 @@ public class StationContent : MonoBehaviour
                 {
                     if (symbols[searched_symb[0]][1]!="" && symbols[searched_symb[0]][2] != "")
                     {
-                        int[] ret(int y) { int[] x = { y, searched_state[0] }; exepshin = new Exepshin(); return x; }
-                        switch (symbols[searched_symb[0]][1])
+                        string[] command = { "L", "R", "!" };
+                        if (command.Contains(symbols[searched_symb[0]][1]))
                         {
-                            case "L": return ret(-1);
-                            case "R": return ret(1);
-                            case "!": return ret(0);
-                            default: { exepshin = new Exepshin(searched_state[0], searched_symb); return null; }
+                            exepshin = new Exepshin();
+                            return new Table(searched_state[0], searched_symb[0]);
                         }
+                        exepshin = new Exepshin(searched_state[0], searched_symb);
                     }
                     else 
                     {
                         exepshin = new Exepshin(searched_state[0],searched_symb);
-                        return null;
                     }
                 }
                 else if (searched_symb.Count() == 0)
                 {
 
                     exepshin = new Exepshin(ind_state,searched_state[0], ind_symb);
-                    return null;
                 }
                 else
                 {
                     exepshin = new Exepshin(searched_state[0],searched_symb);
-                    return null;
                 }
 
             }
             else if (searched_state.Count()==0)
             {
                 exepshin = new Exepshin(ind_state, ind_symb);
-                return null;
             }
             else
             {
                 exepshin = new Exepshin(searched_state);
-                return null;
             }
+            return null;
         }
-        public void GoIndex()
+        public class Table
         {
-
+            public int state_index { get; }
+            public int symbol_index { get; }
+            public Table(int state_index, int symbol_index)
+            {
+                this.state_index = state_index;
+                this.symbol_index = symbol_index;
+            }
+            public string ReturnStateByIndex(int index_state)
+            {
+                return state_names[index_state];
+            }
+            public string[] ReturnSymbolByIndex(int index_symbol)
+            {
+                return state_types[state_index][index_symbol];
+            }
         }
     }
 

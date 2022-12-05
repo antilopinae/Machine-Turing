@@ -28,7 +28,7 @@ public class ControllerManager : MonoBehaviour
             this.cell_obj_parent.transform.parent = cells_parent.transform;
             this.cell_obj_parent.transform.localPosition = new Vector3(cell_position, 0 ,0);
             cell_object.transform.GetChild(0).transform.GetChild(0).GetComponent<TextMeshPro>().text = this.cell_name;
-            Animator(true);
+            GoCellAnimation(States.cell_instant);
         }
         public Cell(GameObject cell_object, float cell_position)
         {
@@ -37,14 +37,12 @@ public class ControllerManager : MonoBehaviour
             this.cell_obj_parent.transform.parent = cells_parent.transform;
             this.cell_obj_parent.transform.localPosition = new Vector3(cell_position, 0, 0);
             cell_object.transform.GetChild(0).transform.GetChild(0).GetComponent<TextMeshPro>().text = this.cell_name;
-            Animator(true);
+            GoCellAnimation(States.cell_instant);
         }
-        public void Animator(bool instant)
+        public void GoCellAnimation(States states)
         {
             if (anim==null) anim = cell_obj_parent.transform.GetChild(0).GetComponent<Animator>();
-            if (instant) StateCell = States.cell_instant;
-            else StateCell = States.cell_change;
-            Debug.Log(anim.GetCurrentAnimatorStateInfo(0).IsName("cell_instant"));
+            anim.SetTrigger(name: states.ToString());
         }
         public GameObject GetObject()
         {
@@ -58,11 +56,11 @@ public class ControllerManager : MonoBehaviour
         {
             return cell_position;
         }
-        private States StateCell
+        /*private States StateCell
         {
-            get { return (States)anim.GetInteger("state"); }
-            set { anim.SetInteger("state", (int)value); }
-        }
+            get {(States)anim. }
+            set { anim.SetTrigger(name: ToString()); Debug.Log(ToString()); }
+        }*/
     }
     [SerializeField] private GameObject[] gameObjects;
     [SerializeField] private Button button;
@@ -138,7 +136,6 @@ public class ControllerManager : MonoBehaviour
                 GameObject cell = generateCells(gameObjects[1]);
                 StartCoroutine(IsThisCoordinateY(cell.transform.GetChild(0)));
                 StageCells.Add(new Cell(name.ToString(), cell, x_position));
-                //Debug.Log(cell.transform.GetChild(0).GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("cell_instant"));
                 CellAct?.Invoke(x_position);
             }
         }
@@ -176,22 +173,21 @@ public class ControllerManager : MonoBehaviour
         }
         return null;
     }
+    private Cell cell;
     private void CellHit(GameObject collider)
     {
-        Cell cell = InitializeCell((collider.transform.GetChild(0).GetComponent<TextMeshPro>().text == ""), collider);
-        Transform cell_transform = cell.GetObject().transform;
-        cell.Animator(false);
-        StartCoroutine(IsThisCoordinateY(cell_transform));
-        StartCoroutine(IsGenerated());
+        this.cell = InitializeCell((collider.transform.GetChild(0).GetComponent<TextMeshPro>().text == ""), collider);
+        cell.GoCellAnimation(States.cell_rename);
     }
-    IEnumerator IsGenerated()
+    public Cell GetCell()
     {
-        while (isGenerated)
-        {
-            yield return null;
-        }
-        Debug.Log("Stop");
+        return this.cell;
     }
+    public void Hit()
+    {
+        Debug.Log("Hit!");
+    }
+
     private void OnEnable()
     {
         CellController.onTouched += CellHit; //sobutie
@@ -206,7 +202,6 @@ public class ControllerManager : MonoBehaviour
 public enum States
 {
     cell_instant,
-    cell_change,
-    cell_idle,
-    cell_process
+    cell_rename,
+    cell_state
 }
