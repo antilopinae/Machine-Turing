@@ -6,8 +6,11 @@ using UnityEngine.UI;
 
 public class CellController : MonoBehaviour
 {
-
-    //обработка заднего фона, обработка движения обьектов, обработка движения камеры при открытии панели
+    private float progress = 0;
+    private bool moving = false;
+    private bool start = true;
+    private float x_position;
+    private float bound;
 
     public static Action <GameObject>onTouched;
     private void OnTriggerEnter(Collider collider)
@@ -15,13 +18,9 @@ public class CellController : MonoBehaviour
         if (!start)
         onTouched?.Invoke(collider.gameObject);
     }
-    private float progress = 0;
-    private bool moving=false;
-    private bool start = true;
-    private float x_position;
     private void Start()
     {
-        
+        this.bound = ControllerManager.bound;
     }
     void Update()
     {
@@ -36,7 +35,6 @@ public class CellController : MonoBehaviour
             progress += Time.deltaTime;
             if(progress >= 1) moving= false;
         }
-        
     }
     private void SlipCell(float x_position)
     {
@@ -44,12 +42,21 @@ public class CellController : MonoBehaviour
         this.x_position = x_position;
         moving = true;
     }
+    private void SlipCell(int vector)
+    {
+        x_position = bound * vector + x_position;
+        SlipCell(x_position);
+
+    }
     private void OnEnable()
     {
         ControllerManager.CellAct += SlipCell;
+        MainGame.MovingCells += SlipCell;
     }
     private void OnDisable()
     {
         ControllerManager.CellAct -= SlipCell;
+        MainGame.MovingCells -= SlipCell;
     }
+
 }

@@ -44,6 +44,11 @@ public class ControllerManager : MonoBehaviour
             if (anim==null) anim = cell_obj_parent.transform.GetChild(0).GetComponent<Animator>();
             anim.SetTrigger(name: states.ToString());
         }
+        public void CellRename(string NewCellName)
+        {
+            cell_obj_parent.transform.GetChild(0).transform.GetChild(0).GetComponent<TextMeshPro>().text=NewCellName;
+            cell_name = NewCellName;
+        }
         public GameObject GetObject()
         {
             return cell_obj_parent.transform.GetChild(0).gameObject;
@@ -56,16 +61,11 @@ public class ControllerManager : MonoBehaviour
         {
             return cell_position;
         }
-        /*private States StateCell
-        {
-            get {(States)anim. }
-            set { anim.SetTrigger(name: ToString()); Debug.Log(ToString()); }
-        }*/
     }
     [SerializeField] private GameObject[] gameObjects;
     [SerializeField] private Button button;
     [SerializeField] float step;
-    private float bound;
+    public static float bound;
     private const int sizeMap2=200; //%2
     private float x_position=0f;
     public static List<Cell> StageCells= new List<Cell>();
@@ -77,10 +77,12 @@ public class ControllerManager : MonoBehaviour
     private char[] StartWord;
     private char[] FinishWord;
     private int level_id;
-
-    private void Start()
+    private void Awake()
     {
         bound = gameObjects[0].GetComponentInChildren<MeshFilter>().sharedMesh.bounds.size.x;
+    }
+    private void Start()
+    {
         button.onClick.AddListener(() => { ; });
         SetLevel(1);
     }
@@ -174,19 +176,14 @@ public class ControllerManager : MonoBehaviour
         return null;
     }
     private Cell cell;
+    public static Action<Cell> GetCell;
     private void CellHit(GameObject collider)
     {
         this.cell = InitializeCell((collider.transform.GetChild(0).GetComponent<TextMeshPro>().text == ""), collider);
-        cell.GoCellAnimation(States.cell_rename);
+        GetCell?.Invoke(cell);
+        //cell.GoCellAnimation(States.cell_rename);
     }
-    public Cell GetCell()
-    {
-        return this.cell;
-    }
-    public void Hit()
-    {
-        Debug.Log("Hit!");
-    }
+
 
     private void OnEnable()
     {

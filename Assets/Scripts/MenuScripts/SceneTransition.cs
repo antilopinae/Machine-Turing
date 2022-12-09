@@ -41,7 +41,6 @@ public class SceneTransition : MonoBehaviour
     {
         // Чтобы при открытии сцены, куда мы переключаемся, проигралась анимация opening:
         shouldPlayOpeningAnimation = true;
-
         loadingSceneOperation.allowSceneActivation = true;
     }
 }

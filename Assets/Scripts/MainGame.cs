@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -6,26 +7,31 @@ using UnityEngine.UI;
 
 public class MainGame : MonoBehaviour
 {
-    //обработка игровых движений из скриптов Station Content и Controller Manager
     [SerializeField] StationContent stationcontent;
     [SerializeField] ControllerManager controllerManager;
-    [SerializeField] Button buttonPause;
-    [SerializeField] Button buttonContinue;
+    [SerializeField] Button buttonPauseContinue;
+    [SerializeField] Button buttonPlayGame;
     [SerializeField] Button buttonOneStep;
     public static bool IsPlaying = false;
     public static bool SetLevel = true;
+    private int amountCellStateAnimations=0;
+    public static Action<int> MovingCells;
     private StationContent.Base Base;
     private int ind_state=0;
     private int ind_symbol=0;
+    private string stationChosenName;
+    private ControllerManager.Cell cell;
+    private bool getcell;
     private void GetTableStates(StationContent.Base @base)
     {
         Base= @base;
     }
     private void Start()
     {
-        buttonPause.onClick.AddListener(()=> { Pause(); });
-        buttonOneStep.onClick.AddListener(() => {OneStep(0,"Base"); });
-        buttonContinue.onClick.AddListener(()=> { Continue(); });
+        stationChosenName = "Base";
+        buttonPauseContinue.onClick.AddListener(()=> { Pause(); });
+        buttonOneStep.onClick.AddListener(() => {if(!SetLevel) OneStep(stationChosenName); });
+        buttonPlayGame.onClick.AddListener(()=> { Continue(); });
     }
 
     private void OnApplicationPause(bool pause)
@@ -35,45 +41,91 @@ public class MainGame : MonoBehaviour
     private void OnEnable()
     {
         StationContent.onBase += GetTableStates;
+        OnAnimationOver.AnimationOver += AnimationOver;
+        ControllerManager.GetCell += GetCell;
     }
     private void OnDisable()
     {
         StationContent.onBase -= GetTableStates;
+        OnAnimationOver.AnimationOver -= AnimationOver;
+        ControllerManager.GetCell -= GetCell;
     }
-    private void OneStep(int VectorMachine, string searchedState)
+    private void GetCell(ControllerManager.Cell cell)
     {
-        string next_state;
-        int newVectorMachine;
-        string overwrite_symbol;
-        string name_symbol = this.controllerManager.GetCell().GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text;
-        int ind_state = this.ind_state;
-        int ind_symbol = this.ind_symbol;
-        StationContent.Base.Table table = Base.SearchSymbol(searchedState, name_symbol, ind_state, ind_symbol);
-        next_state=table.ReturnStateByIndex(table.state_index);
-        overwrite_symbol = table.ReturnSymbolByIndex(table.symbol_index)[0];
-        switch (table.ReturnSymbolByIndex(table.symbol_index)[1]) {
-            case "L": newVectorMachine=-1; break;
-            case "R": newVectorMachine=1; break;
-            case "!": newVectorMachine=0; break;
+        this.cell = cell;
+        getcell = true;
+    }
+    private void AnimationOver(States cellAnimationState)
+    {
+        if (cellAnimationState == States.cell_rename)
+        {
+            if (overwrite_symbol!="")
+            cell.CellRename(overwrite_symbol);
+            cell.GoCellAnimation(States.cell_state);
         }
-
+        if (cellAnimationState == States.cell_state)
+        {
+            amountCellStateAnimations++;
+            if (amountCellStateAnimations == 1)
+            {
+                cell.GoCellAnimation(States.cell_rename);
+            }
+            if (amountCellStateAnimations == 2)
+            {
+                amountCellStateAnimations = 0;
+                switch (symbolTable[1])
+                {
+                    case "L": MoveCells(-1); break;
+                    case "R": MoveCells(1); break;
+                    case "!": FinishGame(); break;
+                }
+                this.ind_state = next_stateIndex;
+                this.ind_state = overwrite_symbolIndex;
+                stationChosenName = next_state;
+                getcell = false;
+            }
+        }
     }
-    private IEnumerator IEOneStep()
-    {
+    int next_stateIndex;
+    string next_state;
+    string overwrite_symbol;
+    int overwrite_symbolIndex;
+    string name_symbol;
+    string[] symbolTable;
 
-        yield return null;
+    private void OneStep(string searchedState)
+    {
+        if (getcell)
+        {
+            name_symbol = this.cell.GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text;
+            StationContent.Base.Table table = Base.SearchSymbol(searchedState, name_symbol, ind_state, ind_symbol);
+            next_stateIndex = table.state_index;
+            next_state = table.ReturnStateByIndex(next_stateIndex);
+            overwrite_symbolIndex = table.symbol_index;
+            symbolTable = table.ReturnSymbolByIndex(overwrite_symbolIndex);
+            overwrite_symbol = symbolTable[0];
+            this.cell.GoCellAnimation(States.cell_state);
+        }
+    }
+    private void MoveCells(int vector)
+    {
+        MovingCells?.Invoke(vector);
+    }
+    private void FinishGame()
+    {
+        Debug.Log("Finish Game");
     }
     private void Pause()
     {
-
+        Debug.Log("Pause");
     }
     private void Continue()
     {
-
+        Debug.Log("Continue");
     }
     private void PlayGame()
     {
-
+        Debug.Log("Play Game");
     }
     
 }

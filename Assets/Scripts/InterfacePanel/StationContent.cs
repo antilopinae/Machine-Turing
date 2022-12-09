@@ -13,7 +13,7 @@ public class StationContent : MonoBehaviour
     [SerializeField] private GameObject el_symbol;
     [SerializeField] private GameObject el_add_station;
     [SerializeField] private GameObject el_add_symbol;
-
+    [SerializeField] private Button buttonPlayGame;
     private static List<ElementStation> elementStations = new List<ElementStation>();
     private static List<string[][]> Symbols=new List<string[][]>();
     private static List<string> Stations = new List<string>();
@@ -21,7 +21,9 @@ public class StationContent : MonoBehaviour
 
     public void Start()
     {
+        //Base add SQLite
         content = thisContent;
+        buttonPlayGame.onClick.AddListener(()=> { OnReceivedStations(); ActGame(); });
         //elementStations.Add(new ElementStation(0));
         OnReceivedStations();
     }
@@ -405,7 +407,6 @@ public class StationContent : MonoBehaviour
     {
         var bas = new Base(Stations,Symbols);
         onBase?.Invoke(bas);
-        
     }
 
 }
