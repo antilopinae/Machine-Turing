@@ -50,7 +50,7 @@ public class StationContent : MonoBehaviour
         }
         else { Symbols.Clear(); Stations.Clear();}
         bool isFirst = true;
-        for (int i=0; i<elementStations.Count(); i++)
+        /*for (int i=0; i<elementStations.Count(); i++)
         {
             bool exepshin = false;
             Symbols.Add(elementStations[i].ReturnSymbs());
@@ -73,7 +73,7 @@ public class StationContent : MonoBehaviour
                 elementStations[i].symbolsElements[c].Delete();
             }
             elementStations[i].Delete();
-        }
+        }*/
 
         foreach(Transform child in content)
         {
@@ -88,7 +88,9 @@ public class StationContent : MonoBehaviour
                 symbol.InitializeSymbol(Instans(el_symbol));
             }
             elementStation.CollapseSymbols(elementStation.isActive);
-            Instans(el_add_symbol).GetComponent<Button>().onClick.AddListener(() => {elementStation.AddSymbol(); OnReceivedStations(); });
+            GameObject buttonCollapse = Instans(el_add_symbol);
+            buttonCollapse.SetActive(elementStation.isActive);
+            buttonCollapse.GetComponent<Button>().onClick.AddListener(() => {elementStation.AddSymbol(); OnReceivedStations(); });
         }
         Instans(el_add_station).GetComponent<Button>().onClick.AddListener(() => { elementStations.Add(new ElementStation(elementStations.Count)); OnReceivedStations(); });
     }
@@ -105,10 +107,6 @@ public class StationContent : MonoBehaviour
         private bool initialize = false;
         private bool exepshin = false;
 
-        private void RedExepshin()
-        {
-
-        }
         public void Delete()
         {
             if (initialize)

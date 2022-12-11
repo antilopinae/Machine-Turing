@@ -1,22 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ReturnPanelButton : MonoBehaviour
 {
     [SerializeField] GameObject panel;
     [SerializeField] GameObject partition;
-    [SerializeField] GameObject button;
+    [SerializeField] GameObject gameBack;
     private void Start()
     {
-        button.SetActive(false);
+        gameBack.SetActive(false);
+        gameObject.GetComponent<Button>().onClick.AddListener(() => onClick());
     }
-    public void OnClick()
+    private void onClick()
     {
-        panel.transform.GetChild(0).GetChild(0).GetComponent<StationContent>().OnReceivedStations();
+        panel.transform.GetChild(1).GetChild(0).GetComponent<StationContent>().OnReceivedStations();
         panel.SetActive(false);
         partition.SetActive(false);
-        button.SetActive(true);
-        gameObject.SetActive(false);
+        gameBack.SetActive(true);
     }
 }

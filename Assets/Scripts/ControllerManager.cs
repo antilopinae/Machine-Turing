@@ -63,7 +63,6 @@ public class ControllerManager : MonoBehaviour
         }
     }
     [SerializeField] private GameObject[] gameObjects;
-    [SerializeField] private Button button;
     [SerializeField] float step;
     public static float bound;
     private const int sizeMap2=200; //%2
@@ -83,7 +82,6 @@ public class ControllerManager : MonoBehaviour
     }
     private void Start()
     {
-        button.onClick.AddListener(() => { ; });
         SetLevel(1);
     }
     private void SetLevel(int id)
@@ -129,13 +127,13 @@ public class ControllerManager : MonoBehaviour
             }
             void AddEmptyCell()
             {
-                GameObject cell = generateCells(gameObjects[1]);
+                GameObject cell = generateCells(gameObjects[0]);
                 StartCoroutine(IsThisCoordinateY(cell.transform));
                 StageCells.Add(new Cell(cell, x_position));
             }
             void AddCell(char name)
             {
-                GameObject cell = generateCells(gameObjects[1]);
+                GameObject cell = generateCells(gameObjects[0]);
                 StartCoroutine(IsThisCoordinateY(cell.transform.GetChild(0)));
                 StageCells.Add(new Cell(name.ToString(), cell, x_position));
                 CellAct?.Invoke(x_position);
