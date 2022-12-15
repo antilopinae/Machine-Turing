@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,17 +14,17 @@ public class StationContent : MonoBehaviour
     [SerializeField] private GameObject el_symbol;
     [SerializeField] private GameObject el_add_station;
     [SerializeField] private GameObject el_add_symbol;
-    [SerializeField] private Button buttonPlayGame;
     private static List<ElementStation> elementStations = new List<ElementStation>();
     private static List<string[][]> Symbols=new List<string[][]>();
     private static List<string> Stations = new List<string>();
     private static bool start = true;
+    public static string[] exepshin;
+    public static Base bas;
 
     public void Start()
     {
         //Base add SQLite
         content = thisContent;
-        buttonPlayGame.onClick.AddListener(()=> { OnReceivedStations(); ActGame(); });
         //elementStations.Add(new ElementStation(0));
         OnReceivedStations();
     }
@@ -41,22 +42,26 @@ public class StationContent : MonoBehaviour
             {
                 elementStations.Add(new ElementStation(elementStations.Count()));
 
-                foreach (string[] name_symbol in Symbols[elementStations.Count()-1])
+                foreach (string[] table_symbol in Symbols[elementStations.Count()-1])
                 {
-                    elementStations[elementStations.Count() - 1].AddSymbol(name_symbol);
+                    elementStations[elementStations.Count() - 1].AddSymbol(table_symbol);
                 }
             }
             start = false;
         }
-        else { Symbols.Clear(); Stations.Clear();}
+        else {
+            if (exepshin != null)
+            {
+                ActGame();
+                bas.SearchSymbol(exepshin[0], exepshin[1], Int32.Parse(exepshin[2]), Int32.Parse(exepshin[3]));
+            }
+            Symbols.Clear(); Stations.Clear();
+        }
         bool isFirst = true;
-        /*for (int i=0; i<elementStations.Count(); i++)
+        for (int i=0; i<elementStations.Count(); i++)
         {
             bool exepshin = false;
-            Symbols.Add(elementStations[i].ReturnSymbs());
-            Stations.Add(elementStations[i].GetName());
             elementStations[i].InitializeExepshin(false);
-
             if (Exepshin.error_state.Count() != 0 && Exepshin.error_state.Contains(i))
             {
                 exepshin = true;
@@ -73,8 +78,7 @@ public class StationContent : MonoBehaviour
                 elementStations[i].symbolsElements[c].Delete();
             }
             elementStations[i].Delete();
-        }*/
-
+        }
         foreach(Transform child in content)
         {
             Destroy(child.gameObject);
@@ -87,6 +91,8 @@ public class StationContent : MonoBehaviour
             {
                 symbol.InitializeSymbol(Instans(el_symbol));
             }
+            Symbols.Add(elementStation.ReturnSymbs());
+            Stations.Add(elementStation.GetName());
             elementStation.CollapseSymbols(elementStation.isActive);
             GameObject buttonCollapse = Instans(el_add_symbol);
             buttonCollapse.SetActive(elementStation.isActive);
@@ -143,12 +149,15 @@ public class StationContent : MonoBehaviour
         public string[][] ReturnSymbs()
         {
             string[][] symbols;
-            symbols = new string[symbolsElements.Count][];
-            for (int i=0; i<symbolsElements.Count; ++i)
             {
-                symbols[i] = symbolsElements[i].GetText();
+                symbols = new string[symbolsElements.Count][];
+                for (int i = 0; i < symbolsElements.Count; ++i)
+                {
+                    if (!initialize) { symbols[i] = new string[] { "I","","",""}; }
+                    else symbols[i] = symbolsElements[i].GetText();
+                }
+                return symbols;
             }
-            return symbols;
         }
         public void CollapseSymbols(bool bl)
         {
@@ -172,7 +181,9 @@ public class StationContent : MonoBehaviour
         }
         public string GetName()
         {
-            name = station_input.text;
+            if (initialize)
+                name = station_input.text;
+            else return "";
             return name;
         }
         public void InitializeExepshin(bool exepshin)
@@ -182,14 +193,22 @@ public class StationContent : MonoBehaviour
         public void InitializeStation(GameObject station)
         {
             this.station = station;
-            if (exepshin) station.GetComponent<ExepshinState>().Exepshin();
+            if (exepshin) station.GetComponent<ExepshinSymbol>().Exepshin();
             this.station_input = station.transform.GetChild(0).GetComponent<TMP_InputField>();
             this.collapseButton = station.transform.GetChild(1).GetComponent<Button>();
+            station.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(() => { station.transform.GetChild(2).GetComponent<Button>().onClick.RemoveAllListeners(); Destroy(station); elementStations.RemoveAt(index);InitializeContent();InitializeIndexes(); InitializeContent(); });
             this.collapseButton.gameObject.GetComponent<CollapseButton>().Collapsed(isActive);
             this.station_input.text = name;
             collapseButton.onClick.AddListener(() => { collapseButton.onClick.RemoveAllListeners(); CollapseSymbols(false); isActive = false; InitializeContent(); });
             initialize = true;
     }
+        private void InitializeIndexes()
+        {
+            for (int index=0; index<elementStations.Count; index++)
+            {
+                elementStations[index].index = index;
+            }
+        }
         private void InitializeContent()
         {
             StationContent.content.GetComponent<StationContent>().OnReceivedStations();
@@ -202,10 +221,11 @@ public class StationContent : MonoBehaviour
         private int index;
         private GameObject symbol;
         private TMP_InputField name_input;
+        private TMP_InputField rename_input;
         private TMP_InputField move_input;
         private TMP_InputField nextStation;
         private Button removeButton;
-        private string[] texts = { "A", "R", "Q2" };
+        private string[] texts = {"B" ,"A", "R", "Q2" };
         private bool initialize = false;
         private bool exepshin = false;
         public ElementSymbol(int index)
@@ -221,8 +241,9 @@ public class StationContent : MonoBehaviour
             this.symbol = symbol;
             if (exepshin) symbol.GetComponent<ExepshinSymbol>().Exepshin();
             this.name_input = getComponent(0);
-            this.move_input = getComponent(1);
-            this.nextStation = getComponent(2);
+            this.rename_input = getComponent(1);
+            this.move_input = getComponent(2);
+            this.nextStation = getComponent(3);
             this.removeButton = symbol.transform.GetChild(1).GetComponent<Button>();
             removeButton.onClick.AddListener(() => { Debug.Log(getId()); elementStations[this.index].InitializeCount(); elementStations[this.index].DeleteOnObject(getId()); InitializeContent(); });
             SetText(null);
@@ -247,16 +268,18 @@ public class StationContent : MonoBehaviour
         public string[] GetText()
         {
             texts[0]=name_input.text;
-            texts[1]=move_input.text;
-            texts[2]=nextStation.text;
+            texts[1] = rename_input.text;
+            texts[2]=move_input.text;
+            texts[3]=nextStation.text;
             return texts;
         }
         public void SetText(string[] texts)
         {
             if (texts==null) texts = this.texts;
             name_input.text = texts[0];
-            move_input.text = texts[1];
-            nextStation.text = texts[2];
+            rename_input.text = texts[1];
+            move_input.text = texts[2];
+            nextStation.text = texts[3];
         }
         public void Delete()
         {
@@ -265,6 +288,7 @@ public class StationContent : MonoBehaviour
                 GetText();
                 Destroy(symbol);
             }
+            else Destroy(symbol);
         }
         public void SetId(int id)
         {
@@ -287,6 +311,11 @@ public class StationContent : MonoBehaviour
         }
         public Table SearchSymbol(string name_state, string name_symbol, int ind_state, int ind_symb)
         {
+            StationContent.exepshin = new string[4];
+            StationContent.exepshin[0] = name_state;
+            StationContent.exepshin[1] = name_symbol;
+            StationContent.exepshin[2] = ind_state.ToString();
+            StationContent.exepshin[3] = ind_symb.ToString();
             List<int> searched_state=new List<int>();
             for (int i = 0; i < state_names.Count; i++)
             {
@@ -299,16 +328,18 @@ public class StationContent : MonoBehaviour
                 List<int> searched_symb = new List<int>();
                 for (int i = 0; i < symbols.Length; i++)
                 {
+                    Debug.Log(symbols[i][1]);
                     if (symbols[i][0] == name_symbol && name_symbol != "") searched_symb.Add(i);
                 }
                 if (searched_symb.Count() == 1)
                 {
-                    if (symbols[searched_symb[0]][1]!="" && symbols[searched_symb[0]][2] != "")
+                    if (symbols[searched_symb[0]][1]!="" && symbols[searched_symb[0]][2]!= ""&& symbols[searched_symb[0]][3] != "")
                     {
                         string[] command = { "L", "R", "!" };
-                        if (command.Contains(symbols[searched_symb[0]][1]))
+                        if (command.Contains(symbols[searched_symb[0]][2]))
                         {
                             exepshin = new Exepshin();
+                            StationContent.exepshin = null;
                             return new Table(searched_state[0], searched_symb[0]);
                         }
                         exepshin = new Exepshin(searched_state[0], searched_symb);
@@ -341,10 +372,11 @@ public class StationContent : MonoBehaviour
         }
         public class Table
         {
-            public int state_index { get; }
-            public int symbol_index { get; }
+            public int state_index;
+            public int symbol_index;
             public Table(int state_index, int symbol_index)
             {
+                Debug.Log(state_index);
                 this.state_index = state_index;
                 this.symbol_index = symbol_index;
             }
@@ -404,6 +436,9 @@ public class StationContent : MonoBehaviour
     public static void ActGame()
     {
         var bas = new Base(Stations,Symbols);
+        Debug.Log(Stations[0]);
+        Debug.Log(Symbols[0][0][0]);
+        StationContent.bas=bas;
         onBase?.Invoke(bas);
     }
 

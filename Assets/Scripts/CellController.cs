@@ -11,6 +11,7 @@ public class CellController : MonoBehaviour
     private bool start = true;
     private float x_position;
     private float bound;
+    private float step=0f;
 
     public static Action <GameObject>onTouched;
     private void OnTriggerEnter(Collider collider)
@@ -21,12 +22,14 @@ public class CellController : MonoBehaviour
     private void Start()
     {
         this.bound = ControllerManager.bound;
+        this.step=ControllerManager.step;
     }
     void Update()
     {
         if (MainGame.SetLevel == false && this.start)
         {
             ControllerManager.Cell.cells_parent.transform.position = new Vector3(0, 0, 0);
+            x_position = 0f;
             start = false;
         }
         if (moving)
@@ -44,9 +47,8 @@ public class CellController : MonoBehaviour
     }
     private void SlipCell(int vector)
     {
-        x_position = bound * vector + x_position;
+        x_position = (bound+step) * vector + this.x_position;
         SlipCell(x_position);
-
     }
     private void OnEnable()
     {

@@ -69,6 +69,7 @@
     <Compile Include="Assets\Scripts\NoInstance\ButtonOneTime.cs" />
     <Compile Include="Assets\Scripts\MenuScripts\SceneTransition.cs" />
     <Compile Include="Assets\Scripts\InterfacePanel\ExepshinState.cs" />
+    <Compile Include="Assets\Scripts\MoverCamera.cs" />
     <Compile Include="Assets\Scripts\InterfacePanel\StationContent.cs" />
     <Compile Include="Assets\Scripts\InterfacePanel\ExepshinMoveText.cs" />
     <Compile Include="Assets\Scripts\MenuScripts\StartManager.cs" />

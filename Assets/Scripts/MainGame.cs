@@ -12,6 +12,7 @@ public class MainGame : MonoBehaviour
     [SerializeField] Button buttonPauseContinue;
     [SerializeField] Button buttonPlayGame;
     [SerializeField] Button buttonOneStep;
+    [SerializeField] GameObject partishion;
     public static bool IsPlaying = false;
     public static bool SetLevel = true;
     private int amountCellStateAnimations=0;
@@ -19,19 +20,20 @@ public class MainGame : MonoBehaviour
     private StationContent.Base Base;
     private int ind_state=0;
     private int ind_symbol=0;
-    private string stationChosenName;
+    private string stationChosenName="Q1";
     private ControllerManager.Cell cell;
-    private bool getcell;
+    private bool getcell=false;
     private void GetTableStates(StationContent.Base @base)
     {
         Base= @base;
     }
+
+
     private void Start()
     {
-        stationChosenName = "Base";
         buttonPauseContinue.onClick.AddListener(()=> { Pause(); });
-        buttonOneStep.onClick.AddListener(() => {if(!SetLevel) OneStep(stationChosenName); });
-        buttonPlayGame.onClick.AddListener(()=> { Continue(); });
+        buttonOneStep.onClick.AddListener(() => { Continue(); stationcontent.OnReceivedStations(); StationContent.ActGame(); IsPlaying = true;  if(!SetLevel) OneStep(stationChosenName); });
+        buttonPlayGame.onClick.AddListener(()=> { Continue(); /*if (stationcontent.gameObject.activeSelf) partishion.SetActive(true); */});
     }
 
     private void OnApplicationPause(bool pause)
@@ -73,7 +75,7 @@ public class MainGame : MonoBehaviour
             if (amountCellStateAnimations == 2)
             {
                 amountCellStateAnimations = 0;
-                switch (symbolTable[1])
+                switch (symbolTable[2])
                 {
                     case "L": MoveCells(-1); break;
                     case "R": MoveCells(1); break;
@@ -99,12 +101,19 @@ public class MainGame : MonoBehaviour
         {
             name_symbol = this.cell.GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text;
             StationContent.Base.Table table = Base.SearchSymbol(searchedState, name_symbol, ind_state, ind_symbol);
-            next_stateIndex = table.state_index;
-            next_state = table.ReturnStateByIndex(next_stateIndex);
-            overwrite_symbolIndex = table.symbol_index;
-            symbolTable = table.ReturnSymbolByIndex(overwrite_symbolIndex);
-            overwrite_symbol = symbolTable[0];
-            this.cell.GoCellAnimation(States.cell_state);
+            if (table != null)
+            {
+                next_stateIndex = table.state_index;
+                next_state = table.ReturnStateByIndex(next_stateIndex);
+                overwrite_symbolIndex = table.symbol_index;
+                symbolTable = table.ReturnSymbolByIndex(overwrite_symbolIndex);
+                overwrite_symbol = symbolTable[1];
+                this.cell.GoCellAnimation(States.cell_state);
+            }
+            else
+            {
+                stationcontent.OnReceivedStations();
+            }
         }
     }
     private void MoveCells(int vector)

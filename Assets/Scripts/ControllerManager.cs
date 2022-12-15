@@ -63,7 +63,8 @@ public class ControllerManager : MonoBehaviour
         }
     }
     [SerializeField] private GameObject[] gameObjects;
-    [SerializeField] float step;
+    [SerializeField] private float _step;
+    public static float step=0f;
     public static float bound;
     private const int sizeMap2=200; //%2
     private float x_position=0f;
@@ -78,7 +79,8 @@ public class ControllerManager : MonoBehaviour
     private int level_id;
     private void Awake()
     {
-        bound = gameObjects[0].GetComponentInChildren<MeshFilter>().sharedMesh.bounds.size.x;
+        bound = 2*gameObjects[0].GetComponentInChildren<MeshFilter>().sharedMesh.bounds.size.x;
+        step = _step;
     }
     private void Start()
     {

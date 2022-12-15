@@ -20,7 +20,7 @@ public class GetPanelButton : MonoBehaviour
     {
         panel.SetActive(true);
         panel.transform.GetChild(1).GetChild(0).GetComponent<StationContent>().OnReceivedStations();
-        partition.SetActive(MainGame.IsPlaying);
+        //partition.SetActive(MainGame.IsPlaying);
         gameBack.SetActive(false);
     }
 }
