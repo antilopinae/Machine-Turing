@@ -13,8 +13,11 @@ public class MainGame : MonoBehaviour
     [SerializeField] Button buttonPlayGame;
     [SerializeField] Button buttonOneStep;
     [SerializeField] GameObject partishion;
-    public static bool IsPlaying = false;
-    public static bool SetLevel = true;
+    public static string? GameLevelStart = null;
+    public static string? GameLevelFinish = null;
+    public static int? IndGameLevel=null;
+    public static bool IsPlaying;
+    public static bool SetLevel;
     private int amountCellStateAnimations=0;
     public static Action<int> MovingCells;
     private StationContent.Base Base;
@@ -28,12 +31,19 @@ public class MainGame : MonoBehaviour
         Base= @base;
     }
 
-
     private void Start()
     {
         buttonPauseContinue.onClick.AddListener(()=> { Pause(); });
-        buttonOneStep.onClick.AddListener(() => { Continue(); stationcontent.OnReceivedStations(); StationContent.ActGame(); IsPlaying = true;  if(!SetLevel) OneStep(stationChosenName); });
-        buttonPlayGame.onClick.AddListener(()=> { Continue(); /*if (stationcontent.gameObject.activeSelf) partishion.SetActive(true); */});
+        buttonOneStep.onClick.AddListener(() => { Continue(); StartPlay(); if(!SetLevel) OneStep(stationChosenName); });
+        buttonPlayGame.onClick.AddListener(()=> { Continue(); StartPlay(); });
+        IsPlaying = false;
+        SetLevel = true;
+    }
+    private void StartPlay()
+    {
+        IsPlaying = true;
+        stationcontent.OnReceivedStations();
+        StationContent.ActGame();
     }
 
     private void OnApplicationPause(bool pause)
@@ -79,8 +89,9 @@ public class MainGame : MonoBehaviour
                 {
                     case "L": MoveCells(-1); break;
                     case "R": MoveCells(1); break;
-                    case "!": FinishGame(); break;
+                    case "_": MoveCells(0); break;
                 }
+                if (symbolTable[3] == "!") FinishGame();
                 this.ind_state = next_stateIndex;
                 this.ind_state = overwrite_symbolIndex;
                 stationChosenName = next_state;
@@ -100,6 +111,7 @@ public class MainGame : MonoBehaviour
         if (getcell)
         {
             name_symbol = this.cell.GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text;
+            if (name_symbol == "") name_symbol = "_";
             StationContent.Base.Table table = Base.SearchSymbol(searchedState, name_symbol, ind_state, ind_symbol);
             if (table != null)
             {
@@ -137,4 +149,10 @@ public class MainGame : MonoBehaviour
         Debug.Log("Play Game");
     }
     
+}
+public enum GameMode {
+    PlayWithoutPlayer,
+    PlayOneStep,
+    PlaySetting,
+    Pause,
 }

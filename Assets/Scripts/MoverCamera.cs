@@ -8,7 +8,6 @@ public class MoverCamera : MonoBehaviour
     [SerializeField] private float speed;
     [SerializeField] private float shift;
     private Vector3 pos_camera;
-    private GameObject camera;
     private float progress;
     private bool move;
     private int direction;
@@ -16,8 +15,8 @@ public class MoverCamera : MonoBehaviour
     private bool flag_right;
     void Start()
     {
-        camera=gameObject;
-        pos_camera=camera.transform.position;
+        pos_camera = gameObject.transform.position;
+        gameObject.transform.position = new Vector3 (pos_camera.x + shift, gameObject.transform.position.y, gameObject.transform.position.z);
         move = false;
         flag_left = true;
         flag_right = true;
@@ -50,7 +49,7 @@ public class MoverCamera : MonoBehaviour
         }
         if (move)
         {
-            camera.transform.position = Vector3.Lerp(camera.transform.position, new Vector3(pos_camera.x + shift * direction, pos_camera.y, pos_camera.z), progress);
+            gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, new Vector3(pos_camera.x + shift * direction, pos_camera.y, pos_camera.z), progress);
             progress += Time.deltaTime * speed;
             if (progress >= 1) move = false;
         }

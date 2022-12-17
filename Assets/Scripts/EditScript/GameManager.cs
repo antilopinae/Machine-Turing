@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
     public List<Item> Items;
     private void Awake()
     {
-        ControllerManager.Items=this.Items;
+        ControllerManager.Items=Items;
     }
 }
 [System.Serializable]

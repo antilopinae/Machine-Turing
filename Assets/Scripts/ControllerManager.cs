@@ -6,6 +6,7 @@ using TMPro;
 using System;
 using static ControllerManager;
 using Unity.VisualScripting;
+using static UnityEditor.Progress;
 
 public class ControllerManager : MonoBehaviour
 {
@@ -84,7 +85,14 @@ public class ControllerManager : MonoBehaviour
     }
     private void Start()
     {
-        SetLevel(1);
+        if (MainGame.IndGameLevel != null)
+        {
+            SetLevel((int)MainGame.IndGameLevel);
+        }
+        else if (MainGame.GameLevelFinish != null&& MainGame.GameLevelStart!=null)
+        {
+            SetLevel((string)MainGame.GameLevelStart, (string)MainGame.GameLevelFinish);
+        }
     }
     private void SetLevel(int id)
     {
@@ -97,6 +105,16 @@ public class ControllerManager : MonoBehaviour
                 this.FinishWord = item.FinishWord.ToCharArray();
             }
         }
+        InitializeLevel();
+    }
+    private void SetLevel(string startWord, string finishWord)
+    {
+        this.StartWord = startWord.ToCharArray();
+        this.FinishWord = finishWord.ToCharArray();
+        InitializeLevel();
+    }
+    private void InitializeLevel()
+    {
         Cell.cells_parent = new GameObject("CellsParent");
         Cell.cells_parent.transform.position = new Vector3(0, 0, 0);
         x_position = -100 * (bound + step);
@@ -112,11 +130,12 @@ public class ControllerManager : MonoBehaviour
                 if (tet_tet <= sizeMap2 + StartWord.Length && (tet_tet <= sizeMap2 / 2 - 1 || tet_tet >= sizeMap2 / 2 + StartWord.Length))
                 {
                     AddEmptyCell();
+                    Time.timeScale = 4 + Math.Abs(tet_tet - sizeMap2 / 2) / (sizeMap2 / 2);
                 }
                 else if (tet_tet <= sizeMap2 / 2 + StartWord.Length)
                 {
-                    AddCell(StartWord[tet_tet - 100]);
-                    Time.timeScale = 1 + Math.Abs(tet_tet - sizeMap2 / 2) / (sizeMap2 / 2);
+                    AddCell(StartWord[tet_tet - sizeMap2 / 2]);
+                    Time.timeScale = 1f;
                 }
                 else
                 {
