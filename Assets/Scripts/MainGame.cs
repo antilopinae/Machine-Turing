@@ -1,7 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +11,7 @@ public class MainGame : MonoBehaviour
     [SerializeField] Button buttonPauseContinue;
     [SerializeField] Button buttonPlayGame;
     [SerializeField] Button buttonOneStep;
-    [SerializeField] GameObject partishion;
+    [SerializeField] GameObject panelPause;
     public static string? GameLevelStart = null;
     public static string? GameLevelFinish = null;
     public static int? IndGameLevel=null;
@@ -20,24 +19,106 @@ public class MainGame : MonoBehaviour
     public static bool SetLevel;
     private int amountCellStateAnimations=0;
     public static Action<int> MovingCells;
+    public static Action<GameMode> MainGameMode;
+    private GameMode NowGameMode;
     private StationContent.Base Base;
     private int ind_state=0;
     private int ind_symbol=0;
     private string stationChosenName="Q1";
     private ControllerManager.Cell cell;
     private bool getcell=false;
+    private GameMode gameModePause;
     private void GetTableStates(StationContent.Base @base)
     {
         Base= @base;
     }
-
-    private void Start()
+    private void Awake()
     {
-        buttonPauseContinue.onClick.AddListener(()=> { Pause(); });
-        buttonOneStep.onClick.AddListener(() => { Continue(); StartPlay(); if(!SetLevel) OneStep(stationChosenName); });
-        buttonPlayGame.onClick.AddListener(()=> { Continue(); StartPlay(); });
         IsPlaying = false;
         SetLevel = true;
+    }
+    private void Start()
+    {
+        NowGameMode = GameMode.Wait;
+        gameModePause = GameMode.Wait;
+        AddListeners();
+        buttonPlayGame.onClick.AddListener(()=> { ButPlay(); });;
+        panelPause.SetActive(false);
+    }
+    private void ButPlay()
+    {
+        Debug.Log("CCC");
+        if (NowGameMode == GameMode.Ecxeption)
+        {
+            MainGameMode?.Invoke(GameMode.RestartEcxept); NowGameMode = GameMode.Wait; AddListeners();
+        }
+        if (NowGameMode == GameMode.PlayWithoutPlayer)
+        {
+            return;
+        }
+        else
+        {
+            if (NowGameMode == GameMode.Pause)
+            {
+                NowGameMode = GameMode.Wait;
+                Continue();
+            }
+            else if (!SetLevel)
+            {
+                NowGameMode = GameMode.PlayWithoutPlayer;
+                StartPlay();
+                OneStep(stationChosenName);
+                Debug.Log(NowGameMode);
+            }
+        }
+    }
+    private void ButPause()
+    {
+        if (!panelPause.activeSelf)
+        {
+            gameModePause = NowGameMode; Pause(); panelPause.SetActive(true); NowGameMode = GameMode.Pause;
+        }
+        else
+        {
+            Continue(); NowGameMode = gameModePause;
+        }
+    }
+    private void ButStep()
+    {
+        if (NowGameMode == GameMode.Pause)
+        {
+            NowGameMode = GameMode.Wait;
+            Continue();
+        }
+        else if(NowGameMode == GameMode.PlayOneStep)
+        {
+            OneStep(stationChosenName);
+        }
+        else if (NowGameMode == GameMode.Wait || NowGameMode == GameMode.PlayOneStep)
+        {
+            Continue(); 
+            if (!SetLevel)
+            {
+                NowGameMode = GameMode.PlayOneStep;
+                StartPlay();
+                OneStep(stationChosenName);
+            };
+        }
+    }
+    private void AddListeners()
+    {
+        buttonOneStep.image.color = Color.white;
+        buttonOneStep.onClick.AddListener(() => { ButStep(); });
+        buttonPauseContinue.image.color = Color.white;
+        buttonPauseContinue.onClick.AddListener(() => { ButPause(); });
+    }
+    public void Restart()
+    {
+        MainGame.SetLevel = true;
+        MainGame.IsPlaying= false;
+        NowGameMode= GameMode.Wait;
+        AddListeners();
+        MainGameMode?.Invoke(GameMode.Restart);
     }
     private void StartPlay()
     {
@@ -48,7 +129,7 @@ public class MainGame : MonoBehaviour
 
     private void OnApplicationPause(bool pause)
     {
-        Pause();
+        if (pause)Pause();
     }
     private void OnEnable()
     {
@@ -66,6 +147,11 @@ public class MainGame : MonoBehaviour
     {
         this.cell = cell;
         getcell = true;
+        if (NowGameMode == GameMode.PlayWithoutPlayer)
+        {
+            OneStep(stationChosenName);
+            Debug.Log(getcell);
+        }
     }
     private void AnimationOver(States cellAnimationState)
     {
@@ -85,22 +171,32 @@ public class MainGame : MonoBehaviour
             if (amountCellStateAnimations == 2)
             {
                 amountCellStateAnimations = 0;
+                getcell = false;
                 switch (symbolTable[2])
                 {
                     case "L": MoveCells(-1); break;
                     case "R": MoveCells(1); break;
-                    case "_": MoveCells(0); break;
+                    case "N": MoveCells(0); break;
                 }
-                if (symbolTable[3] == "!") FinishGame();
-                this.ind_state = next_stateIndex;
-                this.ind_state = overwrite_symbolIndex;
-                stationChosenName = next_state;
-                getcell = false;
+                if (symbolTable[3] == "!")
+                {
+                    NowGameMode = GameMode.Finish;
+                    IsPlaying= false;
+                    MainGameMode?.Invoke(GameMode.Finish);
+                    buttonOneStep.onClick.RemoveAllListeners();
+                    buttonPlayGame.onClick.RemoveAllListeners();
+                    buttonPauseContinue.onClick.RemoveAllListeners();
+                }
+                this.stationChosenName = symbolTable[3];
+                this.ind_state = stateIndex;
+                this.ind_symbol = overwrite_symbolIndex;
+                if (symbolTable[2]=="N") getcell= true;
+                Debug.Log(NowGameMode + "2222222");
             }
         }
     }
-    int next_stateIndex;
-    string next_state;
+    int stateIndex;
+    string state;
     string overwrite_symbol;
     int overwrite_symbolIndex;
     string name_symbol;
@@ -115,15 +211,28 @@ public class MainGame : MonoBehaviour
             StationContent.Base.Table table = Base.SearchSymbol(searchedState, name_symbol, ind_state, ind_symbol);
             if (table != null)
             {
-                next_stateIndex = table.state_index;
-                next_state = table.ReturnStateByIndex(next_stateIndex);
+                stateIndex = table.state_index;
+                state = table.ReturnStateByIndex(stateIndex);
                 overwrite_symbolIndex = table.symbol_index;
                 symbolTable = table.ReturnSymbolByIndex(overwrite_symbolIndex);
                 overwrite_symbol = symbolTable[1];
+                if (overwrite_symbol == "_")
+                {
+                    overwrite_symbol= "";
+                }
                 this.cell.GoCellAnimation(States.cell_state);
             }
             else
             {
+                Debug.Log("ecxeption");
+                MainGameMode?.Invoke(GameMode.Ecxeption);
+                MainGame.IsPlaying = false;
+                MainGame.SetLevel = true;
+                NowGameMode=GameMode.Ecxeption;
+                buttonOneStep.onClick.RemoveAllListeners();
+                buttonPauseContinue.onClick.RemoveAllListeners();
+                buttonOneStep.image.color = Color.gray;
+                buttonPauseContinue.image.color = Color.gray;
                 stationcontent.OnReceivedStations();
             }
         }
@@ -132,27 +241,25 @@ public class MainGame : MonoBehaviour
     {
         MovingCells?.Invoke(vector);
     }
-    private void FinishGame()
-    {
-        Debug.Log("Finish Game");
-    }
     private void Pause()
     {
+        Time.timeScale = 0f;
         Debug.Log("Pause");
     }
     private void Continue()
     {
+        Time.timeScale = 1f;
+        panelPause.SetActive(false);
         Debug.Log("Continue");
     }
-    private void PlayGame()
-    {
-        Debug.Log("Play Game");
-    }
-    
 }
 public enum GameMode {
     PlayWithoutPlayer,
     PlayOneStep,
-    PlaySetting,
+    Wait,
     Pause,
+    Restart,
+    Ecxeption,
+    RestartEcxept,
+    Finish
 }

@@ -7,6 +7,9 @@ public class StartManager : MonoBehaviour
 {
     public void GoToGame()
     {
+        Time.timeScale = 1.0f;
+        //MainGame.SetLevel = true;
+        //MainGame.IsPlaying= false;
         SceneTransition.SwitchToScene("Main Scene");
     }
 
@@ -17,13 +20,13 @@ public class StartManager : MonoBehaviour
             SceneManager.LoadScene("Menu");
         }
     }*/
-    public void Restart()
+    public void Logout()
     {
-        SceneManager.LoadScene("Menu");
-        SceneTransition.SwitchToScene("Main Scene");
+        Application.Quit();
     }
     public void GoToMenu()
     {
+        Time.timeScale= 1.0f;
         SceneManager.LoadScene("Menu");
     }
 }

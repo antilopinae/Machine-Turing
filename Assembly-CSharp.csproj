@@ -78,6 +78,8 @@
     <Compile Include="Assets\Scripts\InterfacePanel\ExepshinMoveText.cs" />
     <Compile Include="Assets\Scripts\MenuScripts\StartManager.cs" />
     <Compile Include="Assets\Scripts\ControllerManager.cs" />
+    <Compile Include="Assets\Scripts\MenuScripts\GoToMenuPanel.cs" />
+    <Compile Include="Assets\Scripts\FinishWinLose.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

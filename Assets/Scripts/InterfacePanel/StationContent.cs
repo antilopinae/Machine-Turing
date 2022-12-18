@@ -21,12 +21,46 @@ public class StationContent : MonoBehaviour
     public static string[] exepshin;
     public static Base bas;
 
-    public void Start()
+    private void Start()
     {
         //Base add SQLite
         content = thisContent;
         //elementStations.Add(new ElementStation(0));
+        elementStations.Clear();
         OnReceivedStations();
+    }
+    private void EventTracking(GameMode _event)
+    {
+        switch (_event)
+        {
+            case GameMode.Restart:
+                Restart();
+                break;
+            case GameMode.Ecxeption:
+                RestartEcxept();
+                break;
+            case GameMode.RestartEcxept:
+                Restart();
+                break;
+        }
+    }
+    private void Restart()
+    {
+        new Exepshin();
+        StationContent.exepshin = null;
+        OnReceivedStations();
+    }
+    private void RestartEcxept()
+    {
+        OnReceivedStations();
+    }
+    private void OnEnable()
+    {
+        MainGame.MainGameMode += EventTracking;
+    }
+    private void OnDisable()
+    {
+        MainGame.MainGameMode -= EventTracking;
     }
     public void OnReceivedStations()
     {
@@ -39,6 +73,11 @@ public class StationContent : MonoBehaviour
         if(elementStations.Count == 0)
         {
             elementStations.Add(new ElementStation(0));
+            elementStations[0].AddSymbol();
+        }
+        else if (elementStations.Count == 1)
+        {
+            if (elementStations[0].symbolsElements.Count == 0)
             elementStations[0].AddSymbol();
         }
         if (start)
@@ -167,7 +206,7 @@ public class StationContent : MonoBehaviour
                 symbols = new string[symbolsElements.Count][];
                 for (int i = 0; i < symbolsElements.Count; ++i)
                 {
-                    if (!initialize) { symbols[i] = new string[] { "I","","",""}; }
+                    if (!initialize) { symbols[i] = new string[] { "","","",""}; }
                     else symbols[i] = symbolsElements[i].GetText();
                 }
                 return symbols;
@@ -210,7 +249,7 @@ public class StationContent : MonoBehaviour
             if (exepshin) station.GetComponent<ExepshinSymbol>().Exepshin();
             this.station_input = station.transform.GetChild(0).GetChild(0).GetComponent<TMP_InputField>();
             this.collapseButton = station.transform.GetChild(1).GetComponent<Button>();
-            station.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(() => { station.transform.GetChild(2).GetComponent<Button>().onClick.RemoveAllListeners(); Destroy(station); elementStations.RemoveAt(index);InitializeContent();InitializeIndexes(); InitializeContent(); });
+            station.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(() => { station.transform.GetChild(2).GetComponent<Button>().onClick.RemoveAllListeners(); Destroy(station); elementStations.RemoveAt(index);InitializeIndexes(); InitializeContent(); });
             this.collapseButton.gameObject.GetComponent<CollapseButton>().Collapsed(isActive);
             this.station_input.text = name;
             collapseButton.onClick.AddListener(() => { collapseButton.onClick.RemoveAllListeners(); CollapseSymbols(false); isActive = false; InitializeContent(); });
@@ -240,7 +279,7 @@ public class StationContent : MonoBehaviour
         private TMP_InputField move_input;
         private TMP_InputField nextStation;
         private Button removeButton;
-        private string[] texts = {"B" ,"A", "R", "Q2" };
+        private string[] texts = {"B" ,"A", "R", "Q1" };
         private bool initialize = false;
         private bool exepshin = false;
         public ElementSymbol(int index)
@@ -351,7 +390,7 @@ public class StationContent : MonoBehaviour
                 {
                     if (symbols[searched_symb[0]][1]!="" && symbols[searched_symb[0]][2]!= ""&& symbols[searched_symb[0]][3] != "")
                     {
-                        string[] command = { "L", "R", "!","N" };
+                        string[] command = { "L", "R", "N" };
                         if (command.Contains(symbols[searched_symb[0]][2]))
                         {
                             exepshin = new Exepshin();
@@ -445,9 +484,6 @@ public class StationContent : MonoBehaviour
             Exepshin.error_symbol.Add(symbol);
         }
     }
-
-
-
     public static Action<Base> onBase;
     public static void ActGame()
     {

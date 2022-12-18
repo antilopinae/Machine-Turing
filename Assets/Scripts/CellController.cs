@@ -8,7 +8,6 @@ public class CellController : MonoBehaviour
 {
     private float progress = 0;
     private bool moving = false;
-    private bool start = true;
     private float x_position;
     private float bound;
     private float step=0f;
@@ -16,7 +15,7 @@ public class CellController : MonoBehaviour
     public static Action <GameObject>onTouched;
     private void OnTriggerEnter(Collider collider)
     {
-        if (!start)
+        if (!MainGame.SetLevel)
         onTouched?.Invoke(collider.gameObject);
     }
     private void Start()
@@ -26,12 +25,6 @@ public class CellController : MonoBehaviour
     }
     void Update()
     {
-        if (MainGame.SetLevel == false && this.start)
-        {
-            ControllerManager.Cell.cells_parent.transform.position = new Vector3(0, 0, 0);
-            x_position = 0f;
-            start = false;
-        }
         if (moving)
         {
             ControllerManager.Cell.cells_parent.transform.position = Vector3.Lerp(ControllerManager.Cell.cells_parent.transform.position, new Vector3(-x_position, 0, 0), progress);

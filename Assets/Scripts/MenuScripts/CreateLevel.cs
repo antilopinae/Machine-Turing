@@ -16,7 +16,7 @@ public class CreateLevel : MonoBehaviour
     }
     public void CreateNewLevel()
     {
-        MainGame.IndGameLevel = 1;
+        MainGame.IndGameLevel = 3;
         startManager.GoToGame();
     }
     public void CreateNewLevel(int number_level)

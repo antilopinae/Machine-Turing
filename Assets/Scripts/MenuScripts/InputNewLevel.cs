@@ -36,7 +36,7 @@ public class InputNewLevel : MonoBehaviour
                 inputFieldStartWord.image.color = Color.red;
                 return;
             }
-            if (inputFieldStartWord.text == "" || !correctSymbol(inputFieldFinishWord.text))
+            if (inputFieldFinishWord.text == "" || !correctSymbol(inputFieldFinishWord.text))
             {
                 inputFieldFinishWord.image.color = Color.red;
                 return;
