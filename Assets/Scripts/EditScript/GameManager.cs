@@ -14,9 +14,11 @@ public class GameManager : MonoBehaviour
 public class Item
 {
     public int Id;
-    public string StartWord;
-    public string FinishWord;
-    //public Sprite Background;
-    //public List<int> Colors;
+    public string Test1_StartWord;
+    public string Test1_FinishWord;
+    public string Test2_StartWord;
+    public string Test2_FinishWord;
+    public string Test3_StartWord;
+    public string Test3_FinishWord;
     public string ABC;
 }

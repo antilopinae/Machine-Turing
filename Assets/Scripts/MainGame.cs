@@ -3,9 +3,11 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEditor.Progress;
 
 public class MainGame : MonoBehaviour
 {
+    [SerializeField] StartLevel _startlevel;
     [SerializeField] StationContent stationcontent;
     [SerializeField] ControllerManager controllerManager;
     [SerializeField] Button buttonPauseContinue;
@@ -28,6 +30,9 @@ public class MainGame : MonoBehaviour
     private ControllerManager.Cell cell;
     private bool getcell=false;
     private GameMode gameModePause;
+
+    [SerializeField] Button[] button_test = new Button[3];
+
     private void GetTableStates(StationContent.Base @base)
     {
         Base= @base;
@@ -37,13 +42,36 @@ public class MainGame : MonoBehaviour
         IsPlaying = false;
         SetLevel = true;
     }
+    private string Test1;
+    private string Test2;
+    private string Test3;
     private void Start()
     {
         NowGameMode = GameMode.Wait;
         gameModePause = GameMode.Wait;
         AddListeners();
-        buttonPlayGame.onClick.AddListener(()=> { ButPlay(); });;
+        buttonPlayGame.onClick.AddListener(() => { ButPlay(); }); ;
         panelPause.SetActive(false);
+
+        if (MainGame.IndGameLevel != null)
+        {
+            foreach (Item item in ControllerManager.Items)
+            {
+                if (item.Id == IndGameLevel)
+                {
+                    button_test[0].onClick.AddListener(() => { controllerManager.SetLevel(item.Test1_StartWord, item.Test1_FinishWord); _startlevel.HideTable(); });
+                    button_test[1].onClick.AddListener(() => { controllerManager.SetLevel(item.Test2_StartWord, item.Test2_FinishWord); _startlevel.HideTable(); });
+                    button_test[2].onClick.AddListener(() => { controllerManager.SetLevel(item.Test3_StartWord, item.Test3_FinishWord); _startlevel.HideTable(); });
+                    break;
+                }
+            }
+        }
+        else if (MainGame.GameLevelFinish != null && MainGame.GameLevelStart != null)
+        {
+            button_test[0].onClick.AddListener(() => { controllerManager.SetLevel((string)MainGame.GameLevelStart, (string)MainGame.GameLevelFinish); _startlevel.HideTable(); });
+            button_test[1].onClick.AddListener(() => { });
+            button_test[2].onClick.AddListener(() => { });
+        }
     }
     private void ButPlay()
     {

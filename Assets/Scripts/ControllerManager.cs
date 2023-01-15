@@ -80,17 +80,6 @@ public class ControllerManager : MonoBehaviour
         bound = 2*gameObjects[0].GetComponentInChildren<MeshFilter>().sharedMesh.bounds.size.x;
         step = _step;
     }
-    private void Start()
-    {
-        if (MainGame.IndGameLevel != null)
-        {
-            SetLevel((int)MainGame.IndGameLevel);
-        }
-        else if (MainGame.GameLevelFinish != null&& MainGame.GameLevelStart!=null)
-        {
-            SetLevel((string)MainGame.GameLevelStart, (string)MainGame.GameLevelFinish);
-        }
-    }
     private void Restart()
     {
         StopAllCoroutines();
@@ -99,23 +88,10 @@ public class ControllerManager : MonoBehaviour
             Destroy(StageCells[0].GetObject());
             StageCells.RemoveAt(0);
         }
-        Start();
+        SetLevel(StartWord.ToString(), FinishWord.ToString());
     }
-    private void SetLevel(int id)
-    {
-        level_id = id;
-        foreach (Item item in Items)
-        {
-            if (item.Id == id)
-            {
-                this.StartWord = item.StartWord.ToCharArray();
-                this.FinishWord = item.FinishWord.ToCharArray();
-                break;
-            }
-        }
-        InitializeLevel();
-    }
-    private void SetLevel(string startWord, string finishWord)
+    
+    public void SetLevel(string startWord, string finishWord)
     {
         this.StartWord = startWord.ToCharArray();
         this.FinishWord = finishWord.ToCharArray();

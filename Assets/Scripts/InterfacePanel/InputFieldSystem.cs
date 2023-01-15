@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 [CreateAssetMenu(fileName = "Input Field Validator", menuName = "Input Field Validator")]
 

@@ -1,11 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Unity.UI;
 using TMPro;
 
-using Unity.VisualScripting;
-using UnityEditor.VersionControl;
 
 public class CursorToNextInput : MonoBehaviour
 {
@@ -52,14 +48,14 @@ public class CursorToNextInput : MonoBehaviour
         if (next_input != null)
         {
             next_input.ActivateInputField();
-            StartCoroutine(deselector());
+            //StartCoroutine(deselector());
         }
     }
-    IEnumerator deselector()
+    /*IEnumerator deselector()
     {
         yield return new WaitForEndOfFrame();
         next_input.MoveTextEnd(false);
-    }
+    }*/
 
 
     private void OnDisable()

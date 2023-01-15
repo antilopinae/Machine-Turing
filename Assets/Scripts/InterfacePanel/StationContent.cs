@@ -139,15 +139,15 @@ public class StationContent : MonoBehaviour
             Stations.Add(elementStation.GetName());
             elementStation.CollapseSymbols(elementStation.isActive);
             GameObject buttonAddSymbol = Instans(el_add_symbol);
-            buttonAddSymbol.transform.GetChild(1).gameObject.SetActive(MainGame.IsPlaying);
+            //buttonAddSymbol.transform.GetChild(1).gameObject.SetActive(MainGame.IsPlaying);
             buttonAddSymbol.SetActive(elementStation.isActive);
             buttonAddSymbol.GetComponent<Button>().onClick.AddListener(() => {elementStation.AddSymbol(); OnReceivedStations(); });
-            if (MainGame.IsPlaying) buttonAddSymbol.GetComponent<Button>().onClick.RemoveAllListeners();
+            //if (MainGame.IsPlaying) buttonAddSymbol.GetComponent<Button>().onClick.RemoveAllListeners();
         }
         GameObject buttonAddState = Instans(el_add_station);
         buttonAddState.GetComponent<Button>().onClick.AddListener(() => { elementStations.Add(new ElementStation(elementStations.Count)); OnReceivedStations(); });
-        if(MainGame.IsPlaying) buttonAddState.GetComponent<Button>().onClick.RemoveAllListeners();
-        buttonAddState.transform.GetChild(1).gameObject.SetActive(MainGame.IsPlaying);
+        //if(MainGame.IsPlaying) buttonAddState.GetComponent<Button>().onClick.RemoveAllListeners();
+        //buttonAddState.transform.GetChild(1).gameObject.SetActive(MainGame.IsPlaying);
     }
 
     private class ElementStation
@@ -254,7 +254,7 @@ public class StationContent : MonoBehaviour
             this.station_input.text = name;
             collapseButton.onClick.AddListener(() => { collapseButton.onClick.RemoveAllListeners(); CollapseSymbols(false); isActive = false; InitializeContent(); });
             initialize = true;
-            station.transform.GetChild(3).gameObject.SetActive(MainGame.IsPlaying);
+            //station.transform.GetChild(3).gameObject.SetActive(MainGame.IsPlaying);
         }
         private void InitializeIndexes()
         {
@@ -306,7 +306,7 @@ public class StationContent : MonoBehaviour
                 return symbol.transform.GetChild(0).GetChild(ind).GetComponent<TMP_InputField>();
             }
             initialize = true;
-            symbol.transform.GetChild(2).gameObject.SetActive(MainGame.IsPlaying);
+            //symbol.transform.GetChild(2).gameObject.SetActive(MainGame.IsPlaying);
     }
         private void InitializeContent()
         {
