@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class CellController : MonoBehaviour
 {
+    [SerializeField][Range(1, 3)] private float speed;
     private float progress = 0;
     private bool moving = false;
     private float x_position;
@@ -23,12 +24,12 @@ public class CellController : MonoBehaviour
         this.bound = ControllerManager.bound;
         this.step=ControllerManager.step;
     }
-    void Update()
+    void FixedUpdate()
     {
         if (moving)
         {
             ControllerManager.Cell.cells_parent.transform.position = Vector3.Lerp(ControllerManager.Cell.cells_parent.transform.position, new Vector3(-x_position, 0, 0), progress);
-            progress += Time.deltaTime;
+            progress += Time.deltaTime*speed;
             if(progress >= 1) moving= false;
         }
     }

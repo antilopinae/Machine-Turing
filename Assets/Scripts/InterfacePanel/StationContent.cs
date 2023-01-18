@@ -251,7 +251,8 @@ public class StationContent : MonoBehaviour
         public void InitializeStation(GameObject station)
         {
             this.station = station;
-            if (exepshin) station.GetComponent<ExepshinSymbol>().Exepshin();
+            if (exepshin) { station.GetComponent<ExepshinSymbol>().Exepshin(); }
+            
             this.station_input = station.transform.GetChild(0).GetChild(0).GetComponent<TMP_InputField>();
             this.collapseButton = station.transform.GetChild(1).GetComponent<Button>();
             station.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(() => { station.transform.GetChild(2).GetComponent<Button>().onClick.RemoveAllListeners(); Destroy(station); elementStations.RemoveAt(index);InitializeIndexes(); InitializeContent(); });
@@ -311,7 +312,8 @@ public class StationContent : MonoBehaviour
         public void InitializeSymbol(GameObject symbol)
         {
             this.symbol = symbol;
-            if (exepshin) symbol.GetComponent<ExepshinSymbol>().Exepshin();
+            if (exepshin) { symbol.GetComponent<ExepshinSymbol>().Exepshin(); symbol.GetComponent<ExepshinSymbol>().SetExeptionColor(true); }
+            else { symbol.GetComponent<ExepshinSymbol>().SetExeptionColor(false); }
             this.name_input = getComponent(0);
             this.rename_input = getComponent(1);
             this.move_input = getComponent(2);
@@ -356,8 +358,9 @@ public class StationContent : MonoBehaviour
             name_input.text = texts[0];
             rename_input.text = texts[1];
             move_input.text = texts[2];
-            nextStation.text = texts[3];
             if (texts[3] == "") { texts[3] = elementStations[this.index].GetName(); }
+            nextStation.text = texts[3];
+            Debug.Log($"Texts3 {texts[3]} ");
         }
         public void Delete()
         {

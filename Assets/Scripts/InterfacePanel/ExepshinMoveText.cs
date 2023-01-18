@@ -10,16 +10,26 @@ public class ExepshinMoveText : MonoBehaviour
     [SerializeField] TMP_InputField inputField;
     [SerializeField] Color exepshinColor;
     [SerializeField] Color normalColor;
-    private string[] str = { "R", "L", "N" };
+    [SerializeField] Color exepshinColor2;
+    private string[] str = { "R", "L", "N", "" };
+    private bool isSymbolExeption=false;
     void Update()
     {
-        if (inputField.gameObject.activeSelf && inputField!=null && TouchScreenKeyboard.visible==false && !str.Contains(inputField.text))
-        {
-            inputField.image.color = exepshinColor;
-        }
+        if (isSymbolExeption) { inputField.image.color = exepshinColor2; }
         else
         {
-            inputField.image.color = normalColor;
+            if (inputField.gameObject.activeSelf && inputField != null && TouchScreenKeyboard.visible == false && !str.Contains(inputField.text))
+            {
+                inputField.image.color = exepshinColor;
+            }
+            else
+            {
+                inputField.image.color = normalColor;
+            }
         }
+    }
+    public void SetExeptionColor(bool fl)
+    {
+        isSymbolExeption = fl;
     }
 }

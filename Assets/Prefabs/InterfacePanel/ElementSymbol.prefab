@@ -1532,6 +1532,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   exepshin: {fileID: 21300000, guid: 285d6517e3dd8f3449b976be4c049074, type: 3}
+  exepshinmoveText: {fileID: 1965898363703862098}
 --- !u!114 &1965898363703862098
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1546,7 +1547,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputField: {fileID: 7586043529755521145}
   exepshinColor: {r: 1, g: 0.13462614, b: 0, a: 0.5882353}
-  normalColor: {r: 0.2627451, g: 0.2627451, b: 0.2627451, a: 1}
+  normalColor: {r: 1, g: 1, b: 1, a: 0.11764706}
+  exepshinColor2: {r: 1, g: 1, b: 1, a: 0.11764706}
 --- !u!1 &5715227072087602123
 GameObject:
   m_ObjectHideFlags: 0
