@@ -63,6 +63,7 @@ public class ControllerManager : MonoBehaviour
     [SerializeField] private GameObject[] gameObjects;
     [SerializeField] private float _step;
     public static float step=0f;
+    [SerializeField] private float _bound;
     public static float bound;
     private const int sizeMap2=200; //%2
     private float x_position=0f;
@@ -77,7 +78,8 @@ public class ControllerManager : MonoBehaviour
     private bool withoutTime=false;
     private void Awake()
     {
-        bound = 2*gameObjects[0].GetComponentInChildren<MeshFilter>().sharedMesh.bounds.size.x;
+        //bound = 2*gameObjects[0].GetComponentInChildren<MeshFilter>().sharedMesh.bounds.size.x;
+        bound = _bound;
         step = _step;
     }
     private void Restart()
@@ -114,16 +116,18 @@ public class ControllerManager : MonoBehaviour
             {
                 if (tet_tet <= sizeMap2 + StartWord.Length && (tet_tet <= sizeMap2 / 2 - 1 || tet_tet >= sizeMap2 / 2 + StartWord.Length))
                 {
+                    withoutTime= true;
                     AddEmptyCell();
-                    Time.timeScale = 4 + Math.Abs(tet_tet - sizeMap2 / 2) / (sizeMap2 / 2);
                 }
                 else if (tet_tet <= sizeMap2 / 2 + StartWord.Length)
                 {
+                    withoutTime= false;
                     AddCell(StartWord[tet_tet - sizeMap2 / 2]);
                     Time.timeScale = 1f;
                 }
                 else
                 {
+                    withoutTime= false;
                     setlevel = false;
                     MainGame.SetLevel = false;
                     Time.timeScale = 1f;

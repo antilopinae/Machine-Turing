@@ -7,23 +7,23 @@ public class StartLevel : MonoBehaviour
     [SerializeField] GameObject[] gameObjects;
     void Start()
     {
-        for(int i=0; i<gameObjects.Length-1;i++)
+        for(int i=0; i<gameObjects.Length;i++)
         {
-            gameObjects[0].SetActive(i==0);
+            gameObjects[i].SetActive(i==0);
         }
     }
     public void HideTable()
     {
-        for (int i = 0; i < gameObjects.Length-1; i++)
+        for (int i = 0; i < gameObjects.Length; i++)
         {
-            gameObjects[0].SetActive(i != 0);
+            gameObjects[i].SetActive(i != 0);
         }
     }
     public void SeeTable()
     {
-        for (int i = 0; i < gameObjects.Length-1; i++)
+        for (int i = 0; i < gameObjects.Length; i++)
         {
-            gameObjects[0].SetActive(i == 0);
+            gameObjects[i].SetActive(i == 0);
         }
     }
 }

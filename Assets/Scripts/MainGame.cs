@@ -32,21 +32,21 @@ public class MainGame : MonoBehaviour
     private GameMode gameModePause;
 
     [SerializeField] Button[] button_test = new Button[3];
+    [SerializeField] GameObject _interface;
 
     private void GetTableStates(StationContent.Base @base)
     {
         Base= @base;
+        stationChosenName = Base.GetFirstState();
     }
     private void Awake()
     {
         IsPlaying = false;
         SetLevel = true;
     }
-    private string Test1;
-    private string Test2;
-    private string Test3;
     private void Start()
     {
+        _interface.SetActive(true);
         NowGameMode = GameMode.Wait;
         gameModePause = GameMode.Wait;
         AddListeners();
@@ -59,6 +59,7 @@ public class MainGame : MonoBehaviour
             {
                 if (item.Id == IndGameLevel)
                 {
+                    Debug.Log("SetLevel1");
                     button_test[0].onClick.AddListener(() => { controllerManager.SetLevel(item.Test1_StartWord, item.Test1_FinishWord); _startlevel.HideTable(); });
                     button_test[1].onClick.AddListener(() => { controllerManager.SetLevel(item.Test2_StartWord, item.Test2_FinishWord); _startlevel.HideTable(); });
                     button_test[2].onClick.AddListener(() => { controllerManager.SetLevel(item.Test3_StartWord, item.Test3_FinishWord); _startlevel.HideTable(); });
@@ -68,6 +69,7 @@ public class MainGame : MonoBehaviour
         }
         else if (MainGame.GameLevelFinish != null && MainGame.GameLevelStart != null)
         {
+            Debug.Log("SetLevel2");
             button_test[0].onClick.AddListener(() => { controllerManager.SetLevel((string)MainGame.GameLevelStart, (string)MainGame.GameLevelFinish); _startlevel.HideTable(); });
             button_test[1].onClick.AddListener(() => { });
             button_test[2].onClick.AddListener(() => { });

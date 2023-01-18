@@ -60,9 +60,11 @@
     <Compile Include="Assets\Scripts\InterfacePanel\GetPanelButton.cs" />
     <Compile Include="Assets\Scripts\InterfacePanel\CollapseButton.cs" />
     <Compile Include="Assets\Scripts\CellController.cs" />
+    <Compile Include="Assets\Scripts\MenuScripts\LevelTable_AfterSelectLevel.cs" />
     <Compile Include="Assets\Scripts\InterfacePanel\ExepshinSymbol.cs" />
     <Compile Include="Assets\Scripts\InterfacePanel\CursorToNextInput.cs" />
     <Compile Include="Assets\Scripts\MenuScripts\LevelMenuController.cs" />
+    <Compile Include="Assets\Scripts\OpenInfLevel.cs" />
     <Compile Include="Assets\Scripts\NoInstance\ScrollViewAdapter.cs" />
     <Compile Include="Assets\Scripts\MenuScripts\GoToMenuPanel.cs" />
     <Compile Include="Assets\Scripts\EditScript\GameManager.cs" />
@@ -82,8 +84,6 @@
     <Compile Include="Assets\Scripts\FinishWinLose.cs" />
     <Compile Include="Assets\Scripts\MenuScripts\StartManager.cs" />
     <Compile Include="Assets\Scripts\ControllerManager.cs" />
-    <Compile Include="Assets\Scripts\MenuScripts\LevelTable_AfterSelectLevel.cs" />
-    <Compile Include="Assets\Scripts\OpenInfLevel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

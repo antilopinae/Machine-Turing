@@ -14,6 +14,7 @@ public class StationContent : MonoBehaviour
     [SerializeField] private GameObject el_symbol;
     [SerializeField] private GameObject el_add_station;
     [SerializeField] private GameObject el_add_symbol;
+    [SerializeField] private Sprite stateSprite;
     private static List<ElementStation> elementStations = new List<ElementStation>();
     private static List<string[][]> Symbols=new List<string[][]>();
     private static List<string> Stations = new List<string>();
@@ -27,7 +28,9 @@ public class StationContent : MonoBehaviour
         content = thisContent;
         //elementStations.Add(new ElementStation(0));
         elementStations.Clear();
+        exepshin= null;
         OnReceivedStations();
+        new Exepshin();
     }
     private void EventTracking(GameMode _event)
     {
@@ -127,10 +130,12 @@ public class StationContent : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+        isFirst= true;
         foreach (ElementStation elementStation in elementStations)
         {
             elementStation.InitializeStation(Instans(el_station));
-
+            if (isFirst==true) elementStation.SetBaseSprite(stateSprite);
+            isFirst= false;
             foreach (ElementSymbol symbol in elementStation.symbolsElements)
             {
                 symbol.InitializeSymbol(Instans(el_symbol));
@@ -256,11 +261,24 @@ public class StationContent : MonoBehaviour
             initialize = true;
             //station.transform.GetChild(3).gameObject.SetActive(MainGame.IsPlaying);
         }
+        public void SetBaseSprite(Sprite spr)
+        {
+            station.transform.GetComponent<Image>().sprite = spr;
+            station.transform.GetChild(2).GetComponent<Image>().color = Color.red;
+        }
         private void InitializeIndexes()
         {
             for (int index=0; index<elementStations.Count; index++)
             {
                 elementStations[index].index = index;
+                elementStations[index].RewriteIndexSymbols();
+            }
+        }
+        public void RewriteIndexSymbols()
+        {
+            foreach(ElementSymbol elementSymbol in symbolsElements)
+            {
+                elementSymbol.RewriteIndex(index);
             }
         }
         private void InitializeContent()
@@ -279,7 +297,7 @@ public class StationContent : MonoBehaviour
         private TMP_InputField move_input;
         private TMP_InputField nextStation;
         private Button removeButton;
-        private string[] texts = {"B" ,"A", "R", "Q1" };
+        private string[] texts = {"A" ,"A", "R", "" };
         private bool initialize = false;
         private bool exepshin = false;
         public ElementSymbol(int index)
@@ -320,6 +338,10 @@ public class StationContent : MonoBehaviour
                 symbol.SetActive(bl);
             }
         }
+        public void RewriteIndex(int ind)
+        {
+            this.index = ind;
+        }
         public string[] GetText()
         {
             texts[0]=name_input.text;
@@ -335,6 +357,7 @@ public class StationContent : MonoBehaviour
             rename_input.text = texts[1];
             move_input.text = texts[2];
             nextStation.text = texts[3];
+            if (texts[3] == "") { texts[3] = elementStations[this.index].GetName(); }
         }
         public void Delete()
         {
@@ -363,6 +386,10 @@ public class StationContent : MonoBehaviour
         {
             Base.state_names = state_names;
             Base.state_types = state_types;
+        }
+        public string GetFirstState()
+        {
+            return state_names[0];
         }
         public Table SearchSymbol(string name_state, string name_symbol, int ind_state, int ind_symb)
         {
