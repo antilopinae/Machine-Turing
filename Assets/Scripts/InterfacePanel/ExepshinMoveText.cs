@@ -13,7 +13,11 @@ public class ExepshinMoveText : MonoBehaviour
     [SerializeField] Color exepshinColor2;
     private string[] str = { "R", "L", "N", "" };
     private bool isSymbolExeption=false;
-    void Update()
+    private void Start()
+    {
+        MoveText();
+    }
+    public void MoveText()
     {
         if (isSymbolExeption) { inputField.image.color = exepshinColor2; }
         else

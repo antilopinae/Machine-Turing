@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System;
-
-
 public class ControllerManager : MonoBehaviour
 {
     public class Cell
@@ -65,7 +63,8 @@ public class ControllerManager : MonoBehaviour
     public static float step=0f;
     [SerializeField] private float _bound;
     public static float bound;
-    private const int sizeMap2=200; //%2
+    private const int sizeMap=100;
+    private const int fieldOfVision = 10;
     private float x_position=0f;
     public static List<Cell> StageCells= new List<Cell>();
     private bool isGenerated = true;
@@ -84,13 +83,17 @@ public class ControllerManager : MonoBehaviour
     }
     private void Restart()
     {
+        ClearTape();
+        SetLevel();
+    }
+    private void ClearTape()
+    {
         StopAllCoroutines();
         while (StageCells.Count != 0)
         {
             Destroy(StageCells[0].GetObject());
             StageCells.RemoveAt(0);
         }
-        SetLevel(StartWord.ToString(), FinishWord.ToString());
     }
     
     public void SetLevel(string startWord, string finishWord)
@@ -99,71 +102,108 @@ public class ControllerManager : MonoBehaviour
         this.FinishWord = finishWord.ToCharArray();
         InitializeLevel();
     }
+    private void SetLevel()
+    {
+        InitializeLevel();
+    }
     private void InitializeLevel()
     {
         Cell.cells_parent = new GameObject("CellsParent");
         Cell.cells_parent.transform.position = new Vector3(0, 0, 0);
-        x_position = -100 * (bound + step);
         tet_tet = 0;
-        setlevel = true;
-        isGenerated = true;
+        StartCoroutine(GeneratedLine());
     }
-    private void Update()
+
+    private void EmptyCellToEnd(char? name,bool toEnd=true, bool animation = false)
     {
-        if (isGenerated)
+        GameObject cell = Instantiate(gameObjects[0], new Vector3(vector(), 0, 0), Quaternion.identity);
+        if(!toEnd)
         {
-            if (setlevel)
+            Cell obj = new Cell(cell, cell.transform.position.x, true);
+            List<Cell> objects = new List<Cell>();
+            objects.Add(obj);
+            //StageCells = objects.Concat(StageCells);
+            //StageCells.AddRange(obj+StageCells);
+        }
+        else if (!animation)
+        {
+            if (name == null) StageCells.Add(new Cell(cell, cell.transform.position.x, true));
+            else
             {
-                if (tet_tet <= sizeMap2 + StartWord.Length && (tet_tet <= sizeMap2 / 2 - 1 || tet_tet >= sizeMap2 / 2 + StartWord.Length))
-                {
-                    withoutTime= true;
-                    AddEmptyCell();
-                }
-                else if (tet_tet <= sizeMap2 / 2 + StartWord.Length)
-                {
-                    withoutTime= false;
-                    AddCell(StartWord[tet_tet - sizeMap2 / 2]);
-                    Time.timeScale = 1f;
-                }
-                else
-                {
-                    withoutTime= false;
-                    setlevel = false;
-                    MainGame.SetLevel = false;
-                    Time.timeScale = 1f;
-                    CellAct?.Invoke(0f);
-                    return;
-                }
-                tet_tet++;
-                x_position += (bound + step);
-            }
-            void AddEmptyCell()
-            {
-                GameObject cell = generateCells(gameObjects[0]);
-                StartCoroutine(IsThisCoordinateY(cell.transform));
-                StageCells.Add(new Cell(cell, x_position,withoutTime));
-            }
-            void AddCell(char name)
-            {
-                GameObject cell = generateCells(gameObjects[0]);
+                StageCells.Add(new Cell(name.ToString(), cell, cell.transform.position.x, false));
                 StartCoroutine(IsThisCoordinateY(cell.transform.GetChild(0)));
-                StageCells.Add(new Cell(name.ToString(), cell, x_position, withoutTime));
-                CellAct?.Invoke(x_position);
+                CellAct?.Invoke(StageCells[StageCells.Count - 1].GetPosition());
             }
         }
+        else
+        {
+            StageCells.Add(new Cell(cell, cell.transform.position.x, false));
+            StartCoroutine(IsThisCoordinateY(cell.transform.GetChild(0)));
+        }
+        float vector()
+        {
+            if(toEnd) { return StageCells[StageCells.Count - 1].GetPosition() + (bound + step); }
+            else { return StageCells[0].GetPosition() - (bound + step); }
+        }
     }
-
-    private GameObject generateCells(GameObject prefab)
+    IEnumerator GeneratedLine()
     {
-        if (withoutTime) return Instantiate(prefab, new Vector3(0, 0, 0), Quaternion.identity);
-        return Instantiate(prefab, new Vector3(0, 1, 0), Quaternion.identity);
+        while (tet_tet < 2*sizeMap + StartWord.Length)
+        {
+            if (tet_tet == 0)
+            {
+                x_position = -sizeMap * (bound + step);
+                GameObject cell = Instantiate(gameObjects[0], new Vector3(0, 0, 0), Quaternion.identity);
+                StageCells.Add(new Cell(cell, x_position, withoutTime));
+                tet_tet++;
+                isGenerated = true;
+            }
+            else if (tet_tet < sizeMap - fieldOfVision)
+            {
+                EmptyCellToEnd(null);
+                tet_tet++;
+            }
+            else if (tet_tet < sizeMap)
+            {
+                if (isGenerated)
+                {
+                    isGenerated = false;
+                    EmptyCellToEnd(null,true, true);
+                    tet_tet++;
+                }
+            }
+            else if (tet_tet < sizeMap + StartWord.Length)
+            {
+                if (isGenerated)
+                {
+                    isGenerated = false;
+                    EmptyCellToEnd(StartWord[tet_tet - sizeMap]);
+                    tet_tet++;
+                }
+            }
+            else if (tet_tet < sizeMap + StartWord.Length + fieldOfVision)
+            {
+                if (isGenerated)
+                {
+                    EmptyCellToEnd(null,true, true);
+                    isGenerated = false;
+                    tet_tet++;
+                }
+            }
+            else
+            {
+                EmptyCellToEnd(null);
+                tet_tet++;
+            }
+            yield return null;
+        }
+        MainGame.SetLevel = false;
+        CellAct?.Invoke(0f);
     }
-    
-
     IEnumerator IsThisCoordinateY(Transform coordY)
     {
         this.isGenerated = false;
-        while (coordY.position.y > 0f)
+        while (coordY.position.y > 0.00001f)
         {
             yield return null;
         }
@@ -227,13 +267,14 @@ public class ControllerManager : MonoBehaviour
         switch(_event)
         {
             case GameMode.Restart:
-                withoutTime = false;
+                //withoutTime = false;
                 Restart();
                 break;
             case GameMode.RestartEcxept:
-                withoutTime = true;
+                //withoutTime = true;
                 Restart();
                 break;
+            case GameMode.ClearAndExit: ClearTape(); break;
         }
     }
     private void OnEnable()

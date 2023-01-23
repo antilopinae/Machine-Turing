@@ -1,18 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FinishWinLose : MonoBehaviour
 {
-    [SerializeField] ControllerManager controller;
-    [SerializeField] GameObject PanelStat;
-    private GameObject panel_win;
-    private GameObject panel_lose;
+    [SerializeField] private ControllerManager controller;
+    [SerializeField] private GameObject PanelFinish;
+    [SerializeField] private Sprite panelFinishSucess;
+    [SerializeField] private Sprite panelFinishLose;
+    private Button but_panel;
+    private Image im_panel;
+
     private void Start()
     {
-        PanelStat.SetActive(false);
-        panel_win= PanelStat.transform.GetChild(0).gameObject;
-        panel_lose = PanelStat.transform.GetChild(1).gameObject;
+        PanelFinish.SetActive(false);
+        but_panel = PanelFinish.transform.GetChild(0).GetComponent<Button>();
+        im_panel = PanelFinish.transform.GetChild(0).GetComponent<Image>();
     }
     private void Finish(GameMode _event)
     {
@@ -20,29 +24,41 @@ public class FinishWinLose : MonoBehaviour
         {
             if (controller.CheckCorrectWord())
             {
-                PanelStat.SetActive(true);
-                panel_lose.SetActive(false);
-                panel_win.SetActive(true);
+                but_panel.onClick.RemoveAllListeners();
+                im_panel.sprite = panelFinishSucess;
+                PanelFinish.SetActive(true);
+                but_panel.onClick.AddListener(() => { but_panel.onClick.RemoveAllListeners(); PanelFinish.SetActive(false); });
             }
             else
             {
-                PanelStat.SetActive(true);
-                panel_lose.SetActive(true);
-                panel_win.SetActive(false);
+                but_panel.onClick.RemoveAllListeners();
+                im_panel.sprite = panelFinishLose;
+                PanelFinish.SetActive(true);
+                but_panel.onClick.AddListener(() => { but_panel.onClick.RemoveAllListeners(); PanelFinish.SetActive(false); });
             }
 
         }
+        else if (_event == GameMode.Ecxeption)
+        {
+            but_panel.onClick.RemoveAllListeners();
+            im_panel.sprite = panelFinishLose;
+            PanelFinish.SetActive(true);
+            but_panel.onClick.AddListener(() => { but_panel.onClick.RemoveAllListeners(); PanelFinish.SetActive(false); });
+        }
         else
         {
-            PanelStat.SetActive(false);
+            PanelFinish.SetActive(false);
         }
     }
+
     private void OnEnable()
     {
         MainGame.MainGameMode += Finish;
+        PanelFinish.SetActive(false);
     }
     private void OnDisable()
     {
         MainGame.MainGameMode -= Finish;
+        PanelFinish.SetActive(false);
     }
 }

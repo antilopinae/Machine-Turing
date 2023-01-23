@@ -15,7 +15,6 @@ public class MainGame : MonoBehaviour
     public static string? GameLevelStart = null;
     public static string? GameLevelFinish = null;
     public static int? IndGameLevel=null;
-    public static bool IsPlaying;
     public static bool SetLevel;
     private int amountCellStateAnimations=0;
     public static Action<int> MovingCells;
@@ -29,8 +28,9 @@ public class MainGame : MonoBehaviour
     private bool getcell=false;
     private GameMode gameModePause;
 
-    [SerializeField] Button[] button_test = new Button[3];
-    [SerializeField] GameObject _interface;
+    [SerializeField] private Button[] button_test = new Button[4];
+    [SerializeField] private GameObject _interface;
+    [SerializeField] private Button ExitMenu;
 
     private void GetTableStates(StationContent.Base @base)
     {
@@ -39,18 +39,17 @@ public class MainGame : MonoBehaviour
     }
     private void Awake()
     {
-        IsPlaying = false;
         SetLevel = true;
     }
     private void Start()
     {
         _interface.SetActive(true);
+        _startlevel.SeeTable();
         NowGameMode = GameMode.Wait;
         gameModePause = GameMode.Wait;
         AddListeners();
         buttonPlayGame.onClick.AddListener(() => { ButPlay(); }); ;
         panelPause.SetActive(false);
-
         if (MainGame.IndGameLevel != null)
         {
             foreach (Item item in ControllerManager.Items)
@@ -58,9 +57,9 @@ public class MainGame : MonoBehaviour
                 if (item.Id == IndGameLevel)
                 {
                     Debug.Log("SetLevel1");
-                    button_test[0].onClick.AddListener(() => { controllerManager.SetLevel(item.Test1_StartWord, item.Test1_FinishWord); _startlevel.HideTable(); });
-                    button_test[1].onClick.AddListener(() => { controllerManager.SetLevel(item.Test2_StartWord, item.Test2_FinishWord); _startlevel.HideTable(); });
-                    button_test[2].onClick.AddListener(() => { controllerManager.SetLevel(item.Test3_StartWord, item.Test3_FinishWord); _startlevel.HideTable(); });
+                    button_test[0].onClick.AddListener(() => { StartGame(item.Test1_StartWord, item.Test1_FinishWord); });
+                    button_test[1].onClick.AddListener(() => { StartGame(item.Test2_StartWord, item.Test2_FinishWord); });
+                    button_test[2].onClick.AddListener(() => { StartGame(item.Test3_StartWord, item.Test3_FinishWord); });
                     break;
                 }
             }
@@ -69,9 +68,39 @@ public class MainGame : MonoBehaviour
         {
             Debug.Log("SetLevel2");
             button_test[0].onClick.AddListener(() => { controllerManager.SetLevel((string)MainGame.GameLevelStart, (string)MainGame.GameLevelFinish); _startlevel.HideTable(); });
-            button_test[1].onClick.AddListener(() => { });
-            button_test[2].onClick.AddListener(() => { });
+            button_test[0].gameObject.SetActive(true);
+            button_test[1].gameObject.SetActive(false);
+            button_test[2].gameObject.SetActive(false);
+            button_test[3].gameObject.SetActive(true);
+            button_test[3].transform.position = button_test[1].transform.position;
         }
+
+        //PanelLoseWin.GetComponent<Image>().sprite;
+        //PanelLoseWin.GetComponent<Button>().onClick.AddListener(() => { });
+        ExitMenu.onClick.AddListener(() => { ClearAndExit(); });
+
+
+    }
+    public void StartGame(string StartWord, string FinishWord)
+    {
+        controllerManager.SetLevel(StartWord, FinishWord); _startlevel.HideTable(); stationcontent.ClearExeption();
+    }
+    private void ClearAndExit()
+    {
+        MainGameMode?.Invoke(GameMode.ClearAndExit);
+        _startlevel.SeeTable();
+        Clear();
+    }
+    private void Clear()
+    {
+        amountCellStateAnimations = 0;
+        ind_state = 0;
+        ind_symbol = 0;
+        NowGameMode = GameMode.Wait;
+        getcell = false;
+        MainGame.SetLevel = true;
+        Continue();
+        AddListeners();
     }
     private void ButPlay()
     {
@@ -102,9 +131,9 @@ public class MainGame : MonoBehaviour
     }
     private void ButPause()
     {
-        if (!panelPause.activeSelf)
+        if (!panelPause.activeInHierarchy)
         {
-            gameModePause = NowGameMode; Pause(); panelPause.SetActive(true); NowGameMode = GameMode.Pause;
+            gameModePause = NowGameMode; Pause(); panelPause.SetActive(true); NowGameMode = GameMode.Pause; MainGameMode?.Invoke(GameMode.Wait);
         }
         else
         {
@@ -136,21 +165,20 @@ public class MainGame : MonoBehaviour
     private void AddListeners()
     {
         buttonOneStep.image.color = Color.white;
+        buttonOneStep.onClick.RemoveAllListeners();
         buttonOneStep.onClick.AddListener(() => { ButStep(); });
+        buttonPauseContinue.onClick.RemoveAllListeners();
         buttonPauseContinue.image.color = Color.white;
         buttonPauseContinue.onClick.AddListener(() => { ButPause(); });
     }
     public void Restart()
     {
-        MainGame.SetLevel = true;
-        MainGame.IsPlaying= false;
-        NowGameMode= GameMode.Wait;
-        AddListeners();
+        Clear();
         MainGameMode?.Invoke(GameMode.Restart);
+        panelPause.SetActive(false);
     }
     private void StartPlay()
     {
-        IsPlaying = true;
         stationcontent.OnReceivedStations();
         StationContent.ActGame();
     }
@@ -209,7 +237,6 @@ public class MainGame : MonoBehaviour
                 if (symbolTable[3] == "!")
                 {
                     NowGameMode = GameMode.Finish;
-                    IsPlaying= false;
                     MainGameMode?.Invoke(GameMode.Finish);
                     buttonOneStep.onClick.RemoveAllListeners();
                     buttonPlayGame.onClick.RemoveAllListeners();
@@ -254,7 +281,6 @@ public class MainGame : MonoBehaviour
             {
                 Debug.Log("ecxeption");
                 MainGameMode?.Invoke(GameMode.Ecxeption);
-                MainGame.IsPlaying = false;
                 MainGame.SetLevel = true;
                 NowGameMode=GameMode.Ecxeption;
                 buttonOneStep.onClick.RemoveAllListeners();
@@ -274,7 +300,7 @@ public class MainGame : MonoBehaviour
         Time.timeScale = 0f;
         Debug.Log("Pause");
     }
-    private void Continue()
+    public void Continue()
     {
         Time.timeScale = 1f;
         panelPause.SetActive(false);
@@ -289,5 +315,6 @@ public enum GameMode {
     Restart,
     Ecxeption,
     RestartEcxept,
-    Finish
+    Finish,
+    ClearAndExit,
 }

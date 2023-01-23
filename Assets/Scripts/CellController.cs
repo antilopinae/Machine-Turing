@@ -24,7 +24,7 @@ public class CellController : MonoBehaviour
         this.bound = ControllerManager.bound;
         this.step=ControllerManager.step;
     }
-    void FixedUpdate()
+    void Update()
     {
         if (moving)
         {
@@ -35,9 +35,9 @@ public class CellController : MonoBehaviour
     }
     private void SlipCell(float x_position)
     {
-        progress = 0f;
         this.x_position = x_position;
-        moving = true;
+            moving = true;
+            progress = 0f;
     }
     private void SlipCell(int vector)
     {

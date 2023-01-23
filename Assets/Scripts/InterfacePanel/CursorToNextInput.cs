@@ -47,10 +47,8 @@ public class CursorToNextInput : MonoBehaviour
                         try
                         {
                             next_input = stationContent.GetChild(i + 1).GetChild(0).GetChild(0).GetComponent<TMP_InputField>();
-                            inputSystem.NextCell -= GoNext;
                         }
                         catch { next_input = stationContent.GetChild(i + 2).GetChild(0).GetChild(0).GetComponent<TMP_InputField>();
-                        inputSystem.NextCell -= GoNext;
                         }
                     }
                 }
@@ -59,6 +57,8 @@ public class CursorToNextInput : MonoBehaviour
         if (next_input != null)
         {
             SeeHelp(prev_input, false);
+            inputSystem.NextCell -= GoNext;
+            Debug.Log("1000");
             next_input.ActivateInputField();
             SeeHelp(next_input, true);
             //StartCoroutine(deselector());

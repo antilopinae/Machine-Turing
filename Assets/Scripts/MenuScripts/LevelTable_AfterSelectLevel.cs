@@ -14,7 +14,7 @@ public class LevelTable_AfterSelectLevel : MonoBehaviour
     private void Start()
     {
         TableLevel.SetActive(false);
-        background = TableLevel.transform.GetChild(1).GetComponent<Image>();
+        background = TableLevel.transform.GetChild(0).GetChild(0).GetComponent<Image>();
     }
     public void SelectLevel(int level)
     {

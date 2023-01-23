@@ -15,7 +15,7 @@ public class OpenInfLevel : MonoBehaviour
         TableLevel.SetActive(false);
         if (MainGame.IndGameLevel != null) {
             level = (int)MainGame.IndGameLevel;
-            TableLevel.transform.GetChild(1).GetComponent<Image>().sprite = images[level - 1];
+            TableLevel.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = images[level - 1];
             button_information.GetComponent<Button>().onClick.AddListener(() => {TableLevel.SetActive(true); });
         }
         else button_information.SetActive(false);

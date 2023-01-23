@@ -21,16 +21,47 @@ public class StationContent : MonoBehaviour
     private static bool start = true;
     public static string[] exepshin;
     public static Base bas;
+    [SerializeField] private Button butCleanTable;
+    [SerializeField] private Button butSaveTable;
+    [SerializeField] private GameObject textSaved;
 
     private void Start()
     {
+        butCleanTable.onClick.AddListener(() => {CleanTable();});
+        butSaveTable.onClick.AddListener(() => { SaveTable(); });
         //Base add SQLite
         content = thisContent;
-        //elementStations.Add(new ElementStation(0));
         elementStations.Clear();
-        exepshin= null;
+        ClearExeption();
+        textSaved.SetActive(false);
+    }
+    private void SaveTable()
+    {
+        //save table
+        StartCoroutine(SeeGraph(textSaved));
+    }
+    IEnumerator<WaitForSeconds> SeeGraph(GameObject @object)
+    {
+        textSaved.SetActive(true);
+        yield return new WaitForSeconds(3f);
+        textSaved.SetActive(false);
+    }
+    private void CleanTable()
+    {
+        Symbols.Clear(); Stations.Clear();
+        ClearExeption();
+        foreach (Transform child in content)
+        {
+            Destroy(child.gameObject);
+        }
+        elementStations.Clear();
         OnReceivedStations();
+    }
+    public void ClearExeption()
+    {
+        exepshin = null;
         new Exepshin();
+        OnReceivedStations();
     }
     private void EventTracking(GameMode _event)
     {
@@ -45,6 +76,7 @@ public class StationContent : MonoBehaviour
             case GameMode.RestartEcxept:
                 Restart();
                 break;
+            case GameMode.ClearAndExit: OnReceivedStations(); break;
         }
     }
     private void Restart()
