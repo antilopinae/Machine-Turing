@@ -27,6 +27,7 @@ public class MainGame : MonoBehaviour
     private ControllerManager.Cell cell;
     private bool getcell=false;
     private GameMode gameModePause;
+    private bool isContinue = true;
 
     [SerializeField] private Button[] button_test = new Button[4];
     [SerializeField] private GameObject _interface;
@@ -83,7 +84,8 @@ public class MainGame : MonoBehaviour
     }
     public void StartGame(string StartWord, string FinishWord)
     {
-        controllerManager.SetLevel(StartWord, FinishWord); _startlevel.HideTable(); stationcontent.ClearExeption();
+        controllerManager.SetLevel(StartWord, FinishWord); _startlevel.HideTable(); stationcontent.ClearExeption(); NowGameMode = GameMode.Wait;
+        gameModePause = GameMode.Wait;
     }
     private void ClearAndExit()
     {
@@ -147,14 +149,14 @@ public class MainGame : MonoBehaviour
             NowGameMode = GameMode.Wait;
             Continue();
         }
-        else if(NowGameMode == GameMode.PlayOneStep)
+        else if(NowGameMode == GameMode.PlayOneStep && isContinue)
         {
             OneStep(stationChosenName);
         }
         else if (NowGameMode == GameMode.Wait || NowGameMode == GameMode.PlayOneStep)
         {
             Continue(); 
-            if (!SetLevel)
+            if (!SetLevel && NowGameMode!=GameMode.PlayOneStep)
             {
                 NowGameMode = GameMode.PlayOneStep;
                 StartPlay();
@@ -164,6 +166,7 @@ public class MainGame : MonoBehaviour
     }
     private void AddListeners()
     {
+        isContinue = true;
         buttonOneStep.image.color = Color.white;
         buttonOneStep.onClick.RemoveAllListeners();
         buttonOneStep.onClick.AddListener(() => { ButStep(); });
@@ -203,16 +206,17 @@ public class MainGame : MonoBehaviour
     {
         this.cell = cell;
         getcell = true;
+        Debug.Log(getcell);
         if (NowGameMode == GameMode.PlayWithoutPlayer)
         {
             OneStep(stationChosenName);
-            Debug.Log(getcell);
         }
     }
     private void AnimationOver(States cellAnimationState)
     {
         if (cellAnimationState == States.cell_rename)
         {
+            isContinue = false;
             if (overwrite_symbol!="")
             cell.CellRename(overwrite_symbol);
             cell.GoCellAnimation(States.cell_state);
@@ -247,6 +251,7 @@ public class MainGame : MonoBehaviour
                 this.ind_symbol = overwrite_symbolIndex;
                 if (symbolTable[2]=="N") getcell= true;
                 Debug.Log(NowGameMode + "2222222");
+                isContinue= true;
             }
         }
     }
@@ -273,7 +278,7 @@ public class MainGame : MonoBehaviour
                 overwrite_symbol = symbolTable[1];
                 if (overwrite_symbol == "_")
                 {
-                    overwrite_symbol= "";
+                    overwrite_symbol= null;
                 }
                 this.cell.GoCellAnimation(States.cell_state);
             }

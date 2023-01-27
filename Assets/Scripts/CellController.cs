@@ -14,9 +14,10 @@ public class CellController : MonoBehaviour
     private float step=0f;
 
     public static Action <GameObject>onTouched;
+    public static Action<bool> AddCellRight;
     private void OnTriggerEnter(Collider collider)
     {
-        if (!MainGame.SetLevel)
+        //if (!MainGame.SetLevel )
         onTouched?.Invoke(collider.gameObject);
     }
     private void Start()
@@ -28,6 +29,7 @@ public class CellController : MonoBehaviour
     {
         if (moving)
         {
+            if(ControllerManager.Cell.cells_parent!=null)
             ControllerManager.Cell.cells_parent.transform.position = Vector3.Lerp(ControllerManager.Cell.cells_parent.transform.position, new Vector3(-x_position, 0, 0), progress);
             progress += Time.deltaTime*speed;
             if(progress >= 1) moving= false;
@@ -43,6 +45,15 @@ public class CellController : MonoBehaviour
     {
         x_position = (bound+step) * vector + this.x_position;
         SlipCell(x_position);
+
+        if(x_position>70*(bound+step))
+        {
+            AddCellRight?.Invoke(true);
+        }
+        else if(x_position < -70 * (bound + step))
+        {
+            AddCellRight?.Invoke(true);
+        }
     }
     private void OnEnable()
     {

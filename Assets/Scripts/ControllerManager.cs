@@ -41,7 +41,7 @@ public class ControllerManager : MonoBehaviour
         }
         public void CellRename(string NewCellName)
         {
-            cell_obj_parent.transform.GetChild(0).transform.GetChild(0).GetComponent<TextMeshPro>().text=NewCellName;
+            cell_obj_parent.transform.GetChild(0).transform.GetChild(0).GetComponent<TextMeshPro>().text = NewCellName;
             cell_name = NewCellName;
         }
         public GameObject GetObject()
@@ -68,7 +68,6 @@ public class ControllerManager : MonoBehaviour
     private float x_position=0f;
     public static List<Cell> StageCells= new List<Cell>();
     private bool isGenerated = true;
-    private bool setlevel = false;
     private int tet_tet; //local counter
     public static List<Item> Items;
     private char[] StartWord;
@@ -94,6 +93,7 @@ public class ControllerManager : MonoBehaviour
             Destroy(StageCells[0].GetObject());
             StageCells.RemoveAt(0);
         }
+        Destroy(Cell.cells_parent);
     }
     
     public void SetLevel(string startWord, string finishWord)
@@ -221,7 +221,7 @@ public class ControllerManager : MonoBehaviour
             if (cell.GetObject() != null)
             {
                 string letter= cell.GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text;
-                if (letter != ""&& StageCells[i-1].GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text=="") 
+                if ((letter != "" && letter!= null )&& (StageCells[i-1].GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text=="" | StageCells[i - 1].GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text == null)) 
                 { isOneWord++; }
                 finishWord += letter;
             }
@@ -277,15 +277,22 @@ public class ControllerManager : MonoBehaviour
             case GameMode.ClearAndExit: ClearTape(); break;
         }
     }
+    private void AddCell(bool right)
+    {
+        //for (int i=0; i<10; i++)
+        EmptyCellToEnd(null, right);
+    }
     private void OnEnable()
     {
         CellController.onTouched += CellHit; //sobutie
         MainGame.MainGameMode += EventTracking;
+        CellController.AddCellRight += AddCell;
     }
     private void OnDisable()
     {
         CellController.onTouched -= CellHit;
         MainGame.MainGameMode -= EventTracking;
+        CellController.AddCellRight -= AddCell;
     }
     public static Action<float> CellAct;
 }
