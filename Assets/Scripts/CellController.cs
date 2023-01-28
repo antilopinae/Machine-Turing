@@ -6,8 +6,7 @@ using UnityEngine.UI;
 
 public class CellController : MonoBehaviour
 {
-    [SerializeField][Range(1, 3)] private float speed;
-    private float progress = 0;
+    [SerializeField][Range(0, 1)] private float speed;
     private bool moving = false;
     private float x_position;
     private float bound;
@@ -25,21 +24,21 @@ public class CellController : MonoBehaviour
         this.bound = ControllerManager.bound;
         this.step=ControllerManager.step;
     }
-    void Update()
+    IEnumerator IMoving()
     {
-        if (moving)
+        float progress = 0f;
+        while (progress < 1)
         {
-            if(ControllerManager.Cell.cells_parent!=null)
+            if (ControllerManager.Cell.cells_parent != null)
             ControllerManager.Cell.cells_parent.transform.position = Vector3.Lerp(ControllerManager.Cell.cells_parent.transform.position, new Vector3(-x_position, 0, 0), progress);
-            progress += Time.deltaTime*speed;
-            if(progress >= 1) moving= false;
+            progress += speed;
+            yield return null;
         }
     }
     private void SlipCell(float x_position)
     {
         this.x_position = x_position;
-            moving = true;
-            progress = 0f;
+        StartCoroutine(IMoving());
     }
     private void SlipCell(int vector)
     {

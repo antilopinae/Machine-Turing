@@ -203,7 +203,7 @@ public class ControllerManager : MonoBehaviour
     IEnumerator IsThisCoordinateY(Transform coordY)
     {
         this.isGenerated = false;
-        while (coordY.position.y > 0.00001f)
+        while (coordY.position.y < 1.3f)
         {
             yield return null;
         }
