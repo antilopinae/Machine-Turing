@@ -74,11 +74,17 @@ public class ControllerManager : MonoBehaviour
     private char[] FinishWord;
     private int level_id;
     private bool withoutTime=false;
+    [SerializeField] Transform loading;
+
     private void Awake()
     {
         //bound = 2*gameObjects[0].GetComponentInChildren<MeshFilter>().sharedMesh.bounds.size.x;
         bound = _bound;
         step = _step;
+    }
+    private void Start()
+    {
+        loading.gameObject.SetActive(false);
     }
     private void Restart()
     {
@@ -111,6 +117,7 @@ public class ControllerManager : MonoBehaviour
         Cell.cells_parent = new GameObject("CellsParent");
         Cell.cells_parent.transform.position = new Vector3(0, 0, 0);
         tet_tet = 0;
+        loading.gameObject.SetActive(true);
         StartCoroutine(GeneratedLine());
     }
 
@@ -199,11 +206,12 @@ public class ControllerManager : MonoBehaviour
         }
         MainGame.SetLevel = false;
         CellAct?.Invoke(0f);
+        loading.gameObject.SetActive(false);
     }
     IEnumerator IsThisCoordinateY(Transform coordY)
     {
         this.isGenerated = false;
-        while (coordY.position.y < 1.3f)
+        while (coordY.position.y < 1.1f)
         {
             yield return null;
         }
