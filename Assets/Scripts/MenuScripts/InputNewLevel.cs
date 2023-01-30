@@ -13,6 +13,7 @@ public class InputNewLevel : MonoBehaviour
     [SerializeField] CreateLevel createLevel;
     private string name_level;
     private const string Correctsymbols = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890";
+    private const string CorrectsymbolsEmpty = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890_";
     private Color Color;
     void Start()
     {
@@ -31,12 +32,12 @@ public class InputNewLevel : MonoBehaviour
     {
         if (PanelInputWord.activeSelf)
         {
-            if (inputFieldStartWord.text == "" || !correctSymbol(inputFieldStartWord.text))
+            if (inputFieldStartWord.text == "" || !correctSymbol(inputFieldStartWord.text, false))
             {
                 inputFieldStartWord.image.color = Color.red;
                 return;
             }
-            if (inputFieldFinishWord.text == "" || !correctSymbol(inputFieldFinishWord.text))
+            if (inputFieldFinishWord.text == "" || !correctSymbol(inputFieldFinishWord.text, true))
             {
                 inputFieldFinishWord.image.color = Color.red;
                 return;
@@ -45,11 +46,18 @@ public class InputNewLevel : MonoBehaviour
         }
         PanelInputWord.SetActive(true);
     }
-    private bool correctSymbol(string str) 
+    private bool correctSymbol(string text, bool isEmpty)
     {
-        foreach (char c in str.ToCharArray())
+        foreach (char c in text.ToCharArray())
         {
-            if (!Correctsymbols.Contains(c)) return false;
+            if (isEmpty)
+            {
+                if (!CorrectsymbolsEmpty.Contains(c)) return false;
+            }
+            else
+            {
+                if (!Correctsymbols.Contains(c)) return false;
+            }
         }
         return true;
     }

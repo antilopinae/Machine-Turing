@@ -118,6 +118,8 @@ public class ControllerManager : MonoBehaviour
         Cell.cells_parent.transform.position = new Vector3(0, 0, 0);
         tet_tet = 0;
         loading.gameObject.SetActive(true);
+        isGenerated = true;
+        OnAnimationOver.AnimationOver += AnimationOver;
         StartCoroutine(GeneratedLine());
     }
 
@@ -126,26 +128,25 @@ public class ControllerManager : MonoBehaviour
         GameObject cell = Instantiate(gameObjects[0], new Vector3(vector(), 0, 0), Quaternion.identity);
         if(!toEnd)
         {
-            Cell obj = new Cell(cell, cell.transform.position.x, true);
-            List<Cell> objects = new List<Cell>();
-            objects.Add(obj);
-            //StageCells = objects.Concat(StageCells);
-            //StageCells.AddRange(obj+StageCells);
+            StageCells.Insert(0, new Cell(cell, cell.transform.position.x, true));
         }
         else if (!animation)
         {
             if (name == null) StageCells.Add(new Cell(cell, cell.transform.position.x, true));
             else
             {
+                isGenerated = false;
                 StageCells.Add(new Cell(name.ToString(), cell, cell.transform.position.x, false));
-                StartCoroutine(IsThisCoordinateY(cell.transform.GetChild(0)));
+                //StartCoroutine(IsThisCoordinateY(cell.transform.GetChild(0)));
                 CellAct?.Invoke(StageCells[StageCells.Count - 1].GetPosition());
             }
         }
         else
         {
+            isGenerated = false;
             StageCells.Add(new Cell(cell, cell.transform.position.x, false));
-            StartCoroutine(IsThisCoordinateY(cell.transform.GetChild(0)));
+            //StartCoroutine(IsThisCoordinateY(cell.transform.GetChild(0)));
+
         }
         float vector()
         {
@@ -207,20 +208,13 @@ public class ControllerManager : MonoBehaviour
         MainGame.SetLevel = false;
         CellAct?.Invoke(0f);
         loading.gameObject.SetActive(false);
+        OnAnimationOver.AnimationOver -= AnimationOver;
     }
-    IEnumerator IsThisCoordinateY(Transform coordY)
-    {
-        this.isGenerated = false;
-        while (coordY.position.y < 1.1f)
-        {
-            yield return null;
-        }
-        this.isGenerated = true;
 
-    }
     public bool CheckCorrectWord()
     {
         int isOneWord = 0;
+        int isTwoWord = 0;
         string finishWord = "";
 
         for (int i = 1; i < StageCells.Count; i++)
@@ -229,22 +223,29 @@ public class ControllerManager : MonoBehaviour
             if (cell.GetObject() != null)
             {
                 string letter= cell.GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text;
-                if ((letter != "" && letter!= null )&& (StageCells[i-1].GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text=="" | StageCells[i - 1].GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text == null)) 
+
+                if ((letter != "" && letter!= null )&&
+    (StageCells[i-1].GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text=="" || StageCells[i - 1].GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text == null))
                 { isOneWord++; }
                 finishWord += letter;
             }
         }
         string _finishWord="";
-        foreach (char s in FinishWord)
+        if (FinishWord[0] != '_') _finishWord += FinishWord[0];
+        for (int i = 1; i < FinishWord.Length; i++)
         {
-            _finishWord+=s;
+            if (FinishWord[i]=='_' && FinishWord[i- 1] != '_')
+            {
+                isTwoWord += 1;
+            }
+            else if (FinishWord[i] != '_') _finishWord += FinishWord[i];
         }
-        if (isOneWord == 1&& finishWord==_finishWord)
+        if(FinishWord.Length > 0 && FinishWord[FinishWord.Length-1] !='_') { isTwoWord += 1; }
+        
+        if (isOneWord == isTwoWord && (finishWord == _finishWord))
         {
             return true;
         }
-        Debug.Log(finishWord);
-        Debug.Log(_finishWord);
         return false;
     }
     //Controller HeadMachine
@@ -290,17 +291,26 @@ public class ControllerManager : MonoBehaviour
         //for (int i=0; i<10; i++)
         EmptyCellToEnd(null, right);
     }
+    private void AnimationOver(States state)
+    {
+        if (state == States.cell_instant)
+        {
+            isGenerated = true;
+        }
+    }
     private void OnEnable()
     {
         CellController.onTouched += CellHit; //sobutie
         MainGame.MainGameMode += EventTracking;
         CellController.AddCellRight += AddCell;
+        OnAnimationOver.AnimationOver += AnimationOver;
     }
     private void OnDisable()
     {
         CellController.onTouched -= CellHit;
         MainGame.MainGameMode -= EventTracking;
         CellController.AddCellRight -= AddCell;
+        OnAnimationOver.AnimationOver -= AnimationOver;
     }
     public static Action<float> CellAct;
 }

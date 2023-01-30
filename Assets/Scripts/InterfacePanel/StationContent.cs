@@ -15,30 +15,60 @@ public class StationContent : MonoBehaviour
     [SerializeField] private GameObject el_add_station;
     [SerializeField] private GameObject el_add_symbol;
     [SerializeField] private Sprite stateSprite;
+    [SerializeField] private ScoreManager scoreManager;
     private static List<ElementStation> elementStations = new List<ElementStation>();
     private static List<string[][]> Symbols=new List<string[][]>();
     private static List<string> Stations = new List<string>();
-    private static bool start = true;
     public static string[] exepshin;
     public static Base bas;
     [SerializeField] private Button butCleanTable;
     [SerializeField] private Button butSaveTable;
+    [SerializeField] private Button butReturnTable;
     [SerializeField] private GameObject textSaved;
+    private bool flag = false;
 
     private void Start()
     {
         butCleanTable.onClick.AddListener(() => {CleanTable();});
-        butSaveTable.onClick.AddListener(() => { SaveTable(); });
-        //Base add SQLite
+        if (MainGame.IndGameLevel != null)
+        {
+            butSaveTable.onClick.AddListener(() => { SaveTable(); });
+            butReturnTable.onClick.AddListener(() => { GetTable(); });
+            butSaveTable.gameObject.SetActive(true);
+            butReturnTable.gameObject.SetActive(true);
+        }
+        else
+        {
+            butSaveTable.gameObject.SetActive(false);
+            butReturnTable.gameObject.SetActive(false);
+        }
         content = thisContent;
         elementStations.Clear();
         ClearExeption();
         textSaved.SetActive(false);
+        GetTable();
     }
     private void SaveTable()
     {
-        //save table
-        StartCoroutine(SeeGraph(textSaved));
+        if (MainGame.IndGameLevel != null)
+        {
+            OnReceivedStations();
+            scoreManager.InputStatesAndSymbols(Stations, Symbols);
+            StartCoroutine(SeeGraph(textSaved));
+        }
+    }
+    private void GetTable()
+    {
+        if (MainGame.IndGameLevel != null)
+        {
+            if (scoreManager.GetSymbols() != null && scoreManager.GetStates() != null)
+            {
+                Symbols = scoreManager.GetSymbols();
+                Stations = scoreManager.GetStates();
+                flag = true;
+                OnReceivedStations();
+            }
+        }
     }
     IEnumerator<WaitForSeconds> SeeGraph(GameObject @object)
     {
@@ -97,6 +127,7 @@ public class StationContent : MonoBehaviour
     {
         MainGame.MainGameMode -= EventTracking;
     }
+
     public void OnReceivedStations()
     {
         GameObject Instans(GameObject prefab)
@@ -105,7 +136,29 @@ public class StationContent : MonoBehaviour
             instance.transform.SetParent(content, false);
             return instance;
         }
-        if(elementStations.Count == 0)
+        if (flag)
+        {
+            elementStations.Clear();
+
+            for (int i=0; i<Stations.Count(); i++)
+            {
+                elementStations.Add(new ElementStation(i));
+                elementStations[i].BeforeSetName(Stations[i]);
+                foreach (string[] table_symbol in Symbols[i])
+                {
+                    elementStations[i].BeforeAddSymbol(table_symbol);
+                }
+            }
+            flag = false;
+        }
+        else if (exepshin != null)
+        {
+            ActGame();
+            bas.SearchSymbol(exepshin[0], exepshin[1], Int32.Parse(exepshin[2]), Int32.Parse(exepshin[3]));
+        }
+        Symbols.Clear(); Stations.Clear();
+
+        if (elementStations.Count == 0)
         {
             elementStations.Add(new ElementStation(0));
             elementStations[0].AddSymbol();
@@ -113,28 +166,7 @@ public class StationContent : MonoBehaviour
         else if (elementStations.Count == 1)
         {
             if (elementStations[0].symbolsElements.Count == 0)
-            elementStations[0].AddSymbol();
-        }
-        if (start)
-        {
-            foreach (string name_state in Stations)
-            {
-                elementStations.Add(new ElementStation(elementStations.Count()));
-
-                foreach (string[] table_symbol in Symbols[elementStations.Count()-1])
-                {
-                    elementStations[elementStations.Count() - 1].AddSymbol(table_symbol);
-                }
-            }
-            start = false;
-        }
-        else {
-            if (exepshin != null)
-            {
-                ActGame();
-                bas.SearchSymbol(exepshin[0], exepshin[1], Int32.Parse(exepshin[2]), Int32.Parse(exepshin[3]));
-            }
-            Symbols.Clear(); Stations.Clear();
+                elementStations[0].AddSymbol();
         }
         bool isFirst = true;
         for (int i=0; i<elementStations.Count(); i++)
@@ -176,15 +208,11 @@ public class StationContent : MonoBehaviour
             Stations.Add(elementStation.GetName());
             elementStation.CollapseSymbols(elementStation.isActive);
             GameObject buttonAddSymbol = Instans(el_add_symbol);
-            //buttonAddSymbol.transform.GetChild(1).gameObject.SetActive(MainGame.IsPlaying);
             buttonAddSymbol.SetActive(elementStation.isActive);
             buttonAddSymbol.GetComponent<Button>().onClick.AddListener(() => {elementStation.AddSymbol(); OnReceivedStations(); });
-            //if (MainGame.IsPlaying) buttonAddSymbol.GetComponent<Button>().onClick.RemoveAllListeners();
         }
         GameObject buttonAddState = Instans(el_add_station);
-        buttonAddState.GetComponent<Button>().onClick.AddListener(() => { elementStations.Add(new ElementStation(elementStations.Count)); OnReceivedStations(); });
-        //if(MainGame.IsPlaying) buttonAddState.GetComponent<Button>().onClick.RemoveAllListeners();
-        //buttonAddState.transform.GetChild(1).gameObject.SetActive(MainGame.IsPlaying);
+        buttonAddState.GetComponent<Button>().onClick.AddListener(() => { elementStations.Add(new ElementStation(elementStations.Count)); Stations.Add(""); OnReceivedStations(); });
     }
 
     private class ElementStation
@@ -219,6 +247,12 @@ public class StationContent : MonoBehaviour
             symbolsElements.Add(symbol);
             symbol.SetText(name_symbs);
             InitializeCount();
+        }
+        public void BeforeAddSymbol(string[] name_symbs)
+        {
+            var symbol = new ElementSymbol(index);
+            symbolsElements.Add(symbol);
+            symbol.BeforeSetText(name_symbs);
         }
         public void InitializeCount()
         {
@@ -269,6 +303,10 @@ public class StationContent : MonoBehaviour
                 station_input.text = str;
             }
         }
+        public void BeforeSetName(string str)
+        {
+            name=str;
+        }
         public string GetName()
         {
             if (initialize)
@@ -287,7 +325,7 @@ public class StationContent : MonoBehaviour
             
             this.station_input = station.transform.GetChild(0).GetChild(0).GetComponent<TMP_InputField>();
             this.collapseButton = station.transform.GetChild(1).GetComponent<Button>();
-            station.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(() => { station.transform.GetChild(2).GetComponent<Button>().onClick.RemoveAllListeners(); Destroy(station); elementStations.RemoveAt(index);InitializeIndexes(); InitializeContent(); });
+            station.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(() => { station.transform.GetChild(2).GetComponent<Button>().onClick.RemoveAllListeners(); Destroy(station); elementStations.RemoveAt(index);InitializeIndexes(); InitializeContent(); content.GetComponent<StationContent>().ClearExeption(); });
             this.collapseButton.gameObject.GetComponent<CollapseButton>().Collapsed(isActive);
             this.station_input.text = name;
             collapseButton.onClick.AddListener(() => { collapseButton.onClick.RemoveAllListeners(); CollapseSymbols(false); isActive = false; InitializeContent(); });
@@ -351,7 +389,7 @@ public class StationContent : MonoBehaviour
             this.move_input = getComponent(2);
             this.nextStation = getComponent(3);
             this.removeButton = symbol.transform.GetChild(1).GetComponent<Button>();
-            removeButton.onClick.AddListener(() => { Debug.Log(getId()); elementStations[this.index].InitializeCount(); elementStations[this.index].DeleteOnObject(getId()); InitializeContent(); });
+            removeButton.onClick.AddListener(() => { Debug.Log(getId()); elementStations[this.index].InitializeCount(); elementStations[this.index].DeleteOnObject(getId()); InitializeContent(); content.GetComponent<StationContent>().ClearExeption(); });
             SetText(null);
             TMP_InputField getComponent(int ind)
             {
@@ -393,6 +431,11 @@ public class StationContent : MonoBehaviour
             if (texts[3] == "") { texts[3] = elementStations[this.index].GetName(); }
             nextStation.text = texts[3];
             Debug.Log($"Texts3 {texts[3]} ");
+        }
+        public void BeforeSetText(string[] texts)
+        {
+            this.texts = texts;
+            Debug.Log("Add 1 symbol");
         }
         public void Delete()
         {
@@ -461,7 +504,7 @@ public class StationContent : MonoBehaviour
                         }
                         exepshin = new Exepshin(searched_state[0], searched_symb);
                     }
-                    else 
+                    else
                     {
                         exepshin = new Exepshin(searched_state[0],searched_symb);
                     }

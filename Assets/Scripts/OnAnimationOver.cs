@@ -12,5 +12,8 @@ public class OnAnimationOver : MonoBehaviour
     {
         AnimationOver?.Invoke(States.cell_state);
     }
-
+    public void InstantOver()
+    {
+        AnimationOver?.Invoke(States.cell_instant);
+    }
 }

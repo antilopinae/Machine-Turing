@@ -1,13 +1,10 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class CellController : MonoBehaviour
 {
     [SerializeField][Range(0, 1)] private float speed;
-    private bool moving = false;
     private float x_position;
     private float bound;
     private float step=0f;
@@ -51,7 +48,7 @@ public class CellController : MonoBehaviour
         }
         else if(x_position < -70 * (bound + step))
         {
-            AddCellRight?.Invoke(true);
+            AddCellRight?.Invoke(false);
         }
     }
     private void OnEnable()

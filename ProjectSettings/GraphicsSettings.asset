@@ -30,12 +30,12 @@ GraphicsSettings:
     m_Shader: {fileID: 102, guid: 0000000000000000f000000000000000, type: 0}
   m_VideoShadersIncludeMode: 2
   m_AlwaysIncludedShaders:
+  - {fileID: 30, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 7, guid: 0000000000000000f000000000000000, type: 0}
-  - {fileID: 15104, guid: 0000000000000000f000000000000000, type: 0}
-  - {fileID: 15105, guid: 0000000000000000f000000000000000, type: 0}
-  - {fileID: 15106, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 10770, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 10703, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 10760, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 10783, guid: 0000000000000000f000000000000000, type: 0}
   m_PreloadedShaders: []
   m_PreloadShadersBatchTimeLimit: -1
@@ -50,10 +50,10 @@ GraphicsSettings:
     m_BuildTarget: 7
     m_Tier: 0
     m_Settings:
-      standardShaderQuality: 1
+      standardShaderQuality: 0
       renderingPath: 1
       hdrMode: 2
-      realtimeGICPUUsage: 25
+      realtimeGICPUUsage: 75
       useReflectionProbeBoxProjection: 0
       useReflectionProbeBlending: 0
       useHDR: 0
@@ -62,7 +62,7 @@ GraphicsSettings:
       prefer32BitShadowMaps: 0
       enableLPPV: 0
       useDitherMaskForAlphaBlendedShadows: 0
-    m_Automatic: 0
+    m_Automatic: 1
   - serializedVersion: 5
     m_BuildTarget: 7
     m_Tier: 1
@@ -70,7 +70,7 @@ GraphicsSettings:
       standardShaderQuality: 1
       renderingPath: 1
       hdrMode: 2
-      realtimeGICPUUsage: 25
+      realtimeGICPUUsage: 75
       useReflectionProbeBoxProjection: 0
       useReflectionProbeBlending: 0
       useHDR: 0
@@ -79,7 +79,7 @@ GraphicsSettings:
       prefer32BitShadowMaps: 0
       enableLPPV: 0
       useDitherMaskForAlphaBlendedShadows: 0
-    m_Automatic: 0
+    m_Automatic: 1
   - serializedVersion: 5
     m_BuildTarget: 7
     m_Tier: 2
@@ -87,7 +87,7 @@ GraphicsSettings:
       standardShaderQuality: 1
       renderingPath: 1
       hdrMode: 2
-      realtimeGICPUUsage: 25
+      realtimeGICPUUsage: 75
       useReflectionProbeBoxProjection: 0
       useReflectionProbeBlending: 0
       useHDR: 0
@@ -96,7 +96,7 @@ GraphicsSettings:
       prefer32BitShadowMaps: 1
       enableLPPV: 0
       useDitherMaskForAlphaBlendedShadows: 0
-    m_Automatic: 0
+    m_Automatic: 1
   m_LightmapStripping: 0
   m_FogStripping: 0
   m_InstancingStripping: 0

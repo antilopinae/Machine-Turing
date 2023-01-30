@@ -49,7 +49,7 @@ public class MainGame : MonoBehaviour
         NowGameMode = GameMode.Wait;
         gameModePause = GameMode.Wait;
         AddListeners();
-        buttonPlayGame.onClick.AddListener(() => { ButPlay(); }); ;
+        buttonPlayGame.onClick.AddListener(() => { ButPlay(); });
         panelPause.SetActive(false);
         if (MainGame.IndGameLevel != null)
         {
@@ -84,6 +84,8 @@ public class MainGame : MonoBehaviour
     }
     public void StartGame(string StartWord, string FinishWord)
     {
+        buttonPlayGame.onClick.RemoveAllListeners();
+        buttonPlayGame.onClick.AddListener(() => { ButPlay(); });
         controllerManager.SetLevel(StartWord, FinishWord); _startlevel.HideTable(); stationcontent.ClearExeption(); NowGameMode = GameMode.Wait;
         gameModePause = GameMode.Wait;
     }
@@ -236,7 +238,7 @@ public class MainGame : MonoBehaviour
                 {
                     case "L": MoveCells(-1); break;
                     case "R": MoveCells(1); break;
-                    case "N": MoveCells(0); break;
+                    case "N": getcell = true; break;
                 }
                 if (symbolTable[3] == "!")
                 {
@@ -249,9 +251,15 @@ public class MainGame : MonoBehaviour
                 this.stationChosenName = symbolTable[3];
                 this.ind_state = stateIndex;
                 this.ind_symbol = overwrite_symbolIndex;
-                if (symbolTable[2]=="N") getcell= true;
-                Debug.Log(NowGameMode + "2222222");
                 isContinue= true;
+
+                if (symbolTable[2] == "N")
+                {
+                    if (NowGameMode == GameMode.PlayWithoutPlayer)
+                    {
+                        OneStep(stationChosenName);
+                    }
+                }
             }
         }
     }
@@ -267,7 +275,7 @@ public class MainGame : MonoBehaviour
         if (getcell)
         {
             name_symbol = this.cell.GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text;
-            if (name_symbol == "") name_symbol = "_";
+            if (name_symbol == ""|| name_symbol==null) name_symbol = "_";
             StationContent.Base.Table table = Base.SearchSymbol(searchedState, name_symbol, ind_state, ind_symbol);
             if (table != null)
             {

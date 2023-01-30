@@ -59,6 +59,7 @@
     <Compile Include="Assets\Scripts\NoInstance\SceneRotation.cs" />
     <Compile Include="Assets\Scripts\InterfacePanel\GetPanelButton.cs" />
     <Compile Include="Assets\Scripts\InterfacePanel\CollapseButton.cs" />
+    <Compile Include="Assets\Scripts\ScoreManager.cs" />
     <Compile Include="Assets\Scripts\CellController.cs" />
     <Compile Include="Assets\Scripts\MenuScripts\LevelTable_AfterSelectLevel.cs" />
     <Compile Include="Assets\Scripts\InputNewLevelSystem.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Assets\Scripts\MainGame.cs" />
     <Compile Include="Assets\Scripts\InterfacePanel\ReturnPanelButton.cs" />
     <Compile Include="Assets\Scripts\InterfacePanel\StartLevel.cs" />
+    <Compile Include="Assets\Scripts\MyDataBase.cs" />
     <Compile Include="Assets\Scripts\MenuScripts\InputNewLevel.cs" />
     <Compile Include="Assets\Scripts\MenuScripts\CreateLevel.cs" />
     <Compile Include="Assets\Scripts\OnAnimationOver.cs" />
@@ -347,6 +349,9 @@
     </Reference>
     <Reference Include="UnityEditor.UnityConnectModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.16f1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Data.Sqlite">
+      <HintPath>Assets\Plugins\Mono.Data.Sqlite.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Burst.Cecil.Pdb">
       <HintPath>Library\PackageCache\com.unity.burst@1.6.6\Unity.Burst.CodeGen\Unity.Burst.Cecil.Pdb.dll</HintPath>

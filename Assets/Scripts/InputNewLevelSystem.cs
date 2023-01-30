@@ -14,6 +14,7 @@ public class InputNewLevelSystem : MonoBehaviour
     [SerializeField] private Button butStartGame;
     [SerializeField] private MainGame mainGame;
     private const string Correctsymbols = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890";
+    private const string CorrectsymbolsEmpty = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890_";
     private Color color;
 
     private void Start()
@@ -32,23 +33,30 @@ public class InputNewLevelSystem : MonoBehaviour
     }
     private void ButtonStartgame()
     {
-            if (inputFieldStartWord.text == "" || !CheckCorrectedSymbols(inputFieldStartWord.text))
+            if (inputFieldStartWord.text == "" || !CheckCorrectedSymbols(inputFieldStartWord.text, false))
             {
                 inputFieldStartWord.image.color = Color.red;
                 return;
             }
-            if (inputFieldFinishWord.text == "" || !CheckCorrectedSymbols(inputFieldFinishWord.text))
+            if (inputFieldFinishWord.text == "" || !CheckCorrectedSymbols(inputFieldFinishWord.text, true))
             {
                 inputFieldFinishWord.image.color = Color.red;
                 return;
             }
             StartGame();
     }
-    private bool CheckCorrectedSymbols(string text)
+    private bool CheckCorrectedSymbols(string text, bool isEmpty)
     {
         foreach (char c in text.ToCharArray())
         {
-            if (!Correctsymbols.Contains(c)) return false;
+            if(isEmpty)
+            {
+                if (!CorrectsymbolsEmpty.Contains(c)) return false;
+            }
+            else
+            {
+                if (!Correctsymbols.Contains(c)) return false;
+            }
         }
         return true;
     }
