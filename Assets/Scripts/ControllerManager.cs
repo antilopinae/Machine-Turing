@@ -5,6 +5,57 @@ using TMPro;
 using System;
 public class ControllerManager : MonoBehaviour
 {
+    public class PullObject
+    {
+        private List<GameObject> objects = new List<GameObject>();
+        private GameObject prefab;
+        private Transform parent;
+        private int LastVoiceCount = -1;
+        private int stock;
+        public PullObject(int countObjects, GameObject prefab, int stock)
+        {
+            this.prefab = prefab;
+            this.stock=stock;
+            GameObject parent;
+            parent = new GameObject($"PullParent{prefab.name}");
+            parent.transform.position = new Vector3(0, -100, 0);
+            this.parent = parent.transform;
+            parent.gameObject.SetActive(false);
+            InstantiateObjects(countObjects);
+        }
+        private void InstantiateObjects(int countObjects)
+        {
+            for (int i = 0; i < countObjects; i++)
+            {
+                GameObject instance = Instantiate(prefab) as GameObject;
+                instance.transform.SetParent(parent, false);
+                objects.Add(instance);
+            }
+        }
+        public GameObject GetAnotherObject()
+        {
+            if (LastVoiceCount+stock > objects.Count)
+            {
+                InstantiateObjects(stock);
+            }
+            LastVoiceCount++;
+            return objects[LastVoiceCount];
+        }
+        public GameObject GetAnotherObject(Transform parent)
+        {
+            GameObject obj = GetAnotherObject();
+            obj.transform.SetParent(parent,false);
+            return obj;
+        }
+        public void ResetVoiceCount()
+        {
+            for(int i=0; i< LastVoiceCount+1; i++)
+            {
+                objects[i].transform.SetParent(parent, false);
+            }
+            LastVoiceCount = -1;
+        }
+    }
     public class Cell
     {
         public static GameObject cells_parent;
@@ -20,7 +71,7 @@ public class ControllerManager : MonoBehaviour
             this.cell_obj_parent = cell_object;
             this.cell_position = cell_position;
             this.cell_name = cell_name;
-            this.cell_obj_parent.transform.parent = cells_parent.transform;
+            //this.cell_obj_parent.transform.parent = cells_parent.transform;
             this.cell_obj_parent.transform.localPosition = new Vector3(cell_position, 0 ,0);
             cell_object.transform.GetChild(0).transform.GetChild(0).GetComponent<TextMeshPro>().text = this.cell_name;
             if(!withoutTime) GoCellAnimation(States.cell_instant);
@@ -29,7 +80,7 @@ public class ControllerManager : MonoBehaviour
         {
             this.cell_obj_parent = cell_object;
             this.cell_position = cell_position;
-            this.cell_obj_parent.transform.parent = cells_parent.transform;
+            //this.cell_obj_parent.transform.parent = cells_parent.transform;
             this.cell_obj_parent.transform.localPosition = new Vector3(cell_position, 0, 0);
             cell_object.transform.GetChild(0).transform.GetChild(0).GetComponent<TextMeshPro>().text = this.cell_name;
             if(!withoutTime) GoCellAnimation(States.cell_instant);
@@ -58,13 +109,13 @@ public class ControllerManager : MonoBehaviour
             return cell_position;
         }
     }
-    [SerializeField] private GameObject[] gameObjects;
+    [SerializeField] private GameObject cell_prefab;
     [SerializeField] private float _step;
     public static float step=0f;
     [SerializeField] private float _bound;
     public static float bound;
-    private const int sizeMap=100;
-    private const int fieldOfVision = 10;
+    private const int sizeMap=40;
+    private const int fieldOfVision = 2;
     private float x_position=0f;
     public static List<Cell> StageCells= new List<Cell>();
     private bool isGenerated = true;
@@ -72,19 +123,20 @@ public class ControllerManager : MonoBehaviour
     public static List<Item> Items;
     private char[] StartWord;
     private char[] FinishWord;
-    private int level_id;
+
     private bool withoutTime=false;
     [SerializeField] Transform loading;
+    ControllerManager.PullObject pull_cells;
 
     private void Awake()
     {
-        //bound = 2*gameObjects[0].GetComponentInChildren<MeshFilter>().sharedMesh.bounds.size.x;
         bound = _bound;
         step = _step;
     }
     private void Start()
     {
         loading.gameObject.SetActive(false);
+        pull_cells = new ControllerManager.PullObject(120, cell_prefab , 20);
     }
     private void Restart()
     {
@@ -96,10 +148,10 @@ public class ControllerManager : MonoBehaviour
         StopAllCoroutines();
         while (StageCells.Count != 0)
         {
-            Destroy(StageCells[0].GetObject());
             StageCells.RemoveAt(0);
         }
         Destroy(Cell.cells_parent);
+        pull_cells.ResetVoiceCount();
     }
     
     public void SetLevel(string startWord, string finishWord)
@@ -125,8 +177,9 @@ public class ControllerManager : MonoBehaviour
 
     private void EmptyCellToEnd(char? name,bool toEnd=true, bool animation = false)
     {
-        GameObject cell = Instantiate(gameObjects[0], new Vector3(vector(), 0, 0), Quaternion.identity);
-        if(!toEnd)
+        GameObject cell = pull_cells.GetAnotherObject(Cell.cells_parent.transform);
+        cell.transform.position=new Vector3(vector(), 0, 0);
+        if (!toEnd)
         {
             StageCells.Insert(0, new Cell(cell, cell.transform.position.x, true));
         }
@@ -161,7 +214,7 @@ public class ControllerManager : MonoBehaviour
             if (tet_tet == 0)
             {
                 x_position = -sizeMap * (bound + step);
-                GameObject cell = Instantiate(gameObjects[0], new Vector3(0, 0, 0), Quaternion.identity);
+                GameObject cell = pull_cells.GetAnotherObject();
                 StageCells.Add(new Cell(cell, x_position, withoutTime));
                 tet_tet++;
                 isGenerated = true;
@@ -173,12 +226,9 @@ public class ControllerManager : MonoBehaviour
             }
             else if (tet_tet < sizeMap)
             {
-                if (isGenerated)
-                {
-                    isGenerated = false;
-                    EmptyCellToEnd(null,true, true);
-                    tet_tet++;
-                }
+                isGenerated = false;
+                EmptyCellToEnd(null, true, true);
+                tet_tet++;
             }
             else if (tet_tet < sizeMap + StartWord.Length)
             {
@@ -193,8 +243,8 @@ public class ControllerManager : MonoBehaviour
             {
                 if (isGenerated)
                 {
-                    EmptyCellToEnd(null,true, true);
                     isGenerated = false;
+                    EmptyCellToEnd(null, true, true);
                     tet_tet++;
                 }
             }

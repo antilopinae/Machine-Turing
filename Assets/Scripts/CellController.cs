@@ -42,11 +42,11 @@ public class CellController : MonoBehaviour
         x_position = (bound+step) * vector + this.x_position;
         SlipCell(x_position);
 
-        if(x_position>70*(bound+step))
+        if(x_position>25*(bound+step))
         {
             AddCellRight?.Invoke(true);
         }
-        else if(x_position < -70 * (bound + step))
+        else if(x_position < -25 * (bound + step))
         {
             AddCellRight?.Invoke(false);
         }
