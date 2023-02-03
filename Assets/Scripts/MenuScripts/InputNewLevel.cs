@@ -12,8 +12,8 @@ public class InputNewLevel : MonoBehaviour
     private TMP_InputField inputFieldFinishWord;
     [SerializeField] CreateLevel createLevel;
     private string name_level;
-    private const string Correctsymbols = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890";
-    private const string CorrectsymbolsEmpty = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890_";
+    private const string Correctsymbols = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890.";
+    private const string CorrectsymbolsEmpty = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890_.";
     private Color Color;
     void Start()
     {

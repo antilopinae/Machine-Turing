@@ -6669,10 +6669,10 @@ MonoBehaviour:
   - Id: 17
     Test1_StartWord: .
     Test1_FinishWord: .
-    Test2_StartWord: "\u2026.."
-    Test2_FinishWord: _
-    Test3_StartWord: "\u2026\u2026\u2026"
-    Test3_FinishWord: .
+    Test2_StartWord: ...
+    Test2_FinishWord: .
+    Test3_StartWord: ..........
+    Test3_FinishWord: _
     ABC: .
   - Id: 18
     Test1_StartWord: 13

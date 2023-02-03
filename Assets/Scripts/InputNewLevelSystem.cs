@@ -13,8 +13,8 @@ public class InputNewLevelSystem : MonoBehaviour
     [SerializeField] private Button butClosePanel;
     [SerializeField] private Button butStartGame;
     [SerializeField] private MainGame mainGame;
-    private const string Correctsymbols = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890";
-    private const string CorrectsymbolsEmpty = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890_";
+    private const string Correctsymbols = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890.";
+    private const string CorrectsymbolsEmpty = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890_.";
     private Color color;
 
     private void Start()

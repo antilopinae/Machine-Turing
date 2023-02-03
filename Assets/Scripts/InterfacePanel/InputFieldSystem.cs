@@ -16,7 +16,7 @@ public class InputFieldSystem : TMPro.TMP_InputValidator
     /// <param name="pos">This is a reference pointer to the input field's text insertion index position (your blinking caret cursor); changing this value will also change the index of the input field's insertion position</param>
     /// <param name="ch">This is the character being typed into the input field</param>
     /// <returns>Return the character you'd allow into </returns>
-    private const string _currentSymbols = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm,1234567890!_$%^&()-+=.";
+    private const string _currentSymbols = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm,1234567890!_$%^&()-+=. ";
     public Action NextCell;
 
     public override char Validate(ref string text, ref int pos, char ch)

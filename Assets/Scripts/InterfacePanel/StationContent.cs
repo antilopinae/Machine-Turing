@@ -79,8 +79,9 @@ public class StationContent : MonoBehaviour
     IEnumerator<WaitForSeconds> SeeGraph(GameObject @object)
     {
         textSaved.SetActive(true);
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1f);
         textSaved.SetActive(false);
+        StopCoroutine(SeeGraph(textSaved));
     }
     private void CleanTable()
     {
