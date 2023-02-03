@@ -19,11 +19,6 @@ public class ScoreManager : MonoBehaviour
         {
             level_id = (int)MainGame.IndGameLevel;
             DataTable table = MyDataBase.GetTable($"SELECT * FROM USER_SOLUTIONS WHERE LEVEL_ID = {level_id};");
-            if (table.Rows.Count!= 0)
-            {
-                states = JsonConvert.DeserializeObject<List<string>>(table.Rows[0][1].ToString());
-                symbols = JsonConvert.DeserializeObject<List<string[][]>>(table.Rows[0][2].ToString());
-            }
         }
     }
     public List<string> GetStates()

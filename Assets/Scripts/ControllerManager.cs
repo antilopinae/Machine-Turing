@@ -146,12 +146,9 @@ public class ControllerManager : MonoBehaviour
     private void ClearTape()
     {
         StopAllCoroutines();
-        while (StageCells.Count != 0)
-        {
-            StageCells.RemoveAt(0);
-        }
-        Destroy(Cell.cells_parent);
+        StageCells.Clear();
         pull_cells.ResetVoiceCount();
+        Destroy(Cell.cells_parent);
     }
     
     public void SetLevel(string startWord, string finishWord)
@@ -267,19 +264,20 @@ public class ControllerManager : MonoBehaviour
         int isTwoWord = 0;
         string finishWord = "";
 
-        for (int i = 1; i < StageCells.Count; i++)
+        for (int i = 1; i < Cell.cells_parent.transform.childCount; i++)
         {
-            Cell cell = StageCells[i];
-            if (cell.GetObject() != null)
+            Transform cell = Cell.cells_parent.transform.GetChild(i);
+            Transform cell_before = Cell.cells_parent.transform.GetChild(i-1);
+            if (cell != null)
             {
-                string letter= cell.GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text;
-
+                string letter= cell.GetChild(0).GetChild(0).GetComponent<TextMeshPro>().text;
                 if ((letter != "" && letter!= null )&&
-    (StageCells[i-1].GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text=="" || StageCells[i - 1].GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text == null))
+    (cell_before.GetChild(0).GetChild(0).GetComponent<TextMeshPro>().text=="" || cell_before.GetChild(0).GetChild(0).GetComponent<TextMeshPro>().text == null))
                 { isOneWord++; }
                 finishWord += letter;
             }
         }
+        Debug.Log(finishWord+"FINISH WORD");
         string _finishWord="";
         if (FinishWord[0] != '_') _finishWord += FinishWord[0];
         for (int i = 1; i < FinishWord.Length; i++)
@@ -299,6 +297,7 @@ public class ControllerManager : MonoBehaviour
         return false;
     }
     //Controller HeadMachine
+    //
     private Cell InitializeCell(bool isTextEmpty, GameObject gameObject)
     {
         for (int i=0; i < StageCells.Count; i++)
@@ -314,12 +313,13 @@ public class ControllerManager : MonoBehaviour
         }
         return null;
     }
-    private Cell cell;
-    public static Action<Cell> GetCell;
+    //
+    //private Cell cell;
+    public static Action<GameObject> GetCell;
     private void CellHit(GameObject collider)
     {
-        this.cell = InitializeCell((collider.transform.GetChild(0).GetComponent<TextMeshPro>().text == ""), collider);
-        GetCell?.Invoke(cell);
+        //this.cell = InitializeCell((collider.transform.GetChild(0).GetComponent<TextMeshPro>().text == ""), collider);
+        GetCell?.Invoke(collider);
     }
     private void EventTracking(GameMode _event)
     {

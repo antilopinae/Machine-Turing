@@ -24,7 +24,7 @@ public class MainGame : MonoBehaviour
     private int ind_state=0;
     private int ind_symbol=0;
     private string stationChosenName="Q1";
-    private ControllerManager.Cell cell;
+    private GameObject cell;
     private bool getcell=false;
     private GameMode gameModePause;
     private bool isContinue = true;
@@ -204,7 +204,8 @@ public class MainGame : MonoBehaviour
         OnAnimationOver.AnimationOver -= AnimationOver;
         ControllerManager.GetCell -= GetCell;
     }
-    private void GetCell(ControllerManager.Cell cell)
+
+    private void GetCell(GameObject cell)
     {
         this.cell = cell;
         getcell = true;
@@ -214,21 +215,31 @@ public class MainGame : MonoBehaviour
             OneStep(stationChosenName);
         }
     }
+    private void GoCellAnimation(States states)
+    {
+        if(cell!=null)
+        this.cell.GetComponent<Animator>().SetTrigger(name: states.ToString());
+    }
+    private void CellRename(string NewCellName)
+    {
+        if(cell!=null)
+        cell.transform.GetChild(0).GetComponent<TextMeshPro>().text = NewCellName;
+    }
     private void AnimationOver(States cellAnimationState)
     {
         if (cellAnimationState == States.cell_rename)
         {
             isContinue = false;
-            if (overwrite_symbol!="")
-            cell.CellRename(overwrite_symbol);
-            cell.GoCellAnimation(States.cell_state);
+            if (overwrite_symbol!="" && overwrite_symbol!="_")
+            CellRename(overwrite_symbol);
+            GoCellAnimation(States.cell_state);
         }
         if (cellAnimationState == States.cell_state)
         {
             amountCellStateAnimations++;
             if (amountCellStateAnimations == 1)
             {
-                cell.GoCellAnimation(States.cell_rename);
+                GoCellAnimation(States.cell_rename);
             }
             if (amountCellStateAnimations == 2)
             {
@@ -248,6 +259,8 @@ public class MainGame : MonoBehaviour
                     buttonPlayGame.onClick.RemoveAllListeners();
                     buttonPauseContinue.onClick.RemoveAllListeners();
                 }
+                Debug.Log(stationChosenName+"   STATE");
+                Debug.Log(overwrite_symbol + "  RENAME");
                 this.stationChosenName = symbolTable[3];
                 this.ind_state = stateIndex;
                 this.ind_symbol = overwrite_symbolIndex;
@@ -274,7 +287,7 @@ public class MainGame : MonoBehaviour
     {
         if (getcell)
         {
-            name_symbol = this.cell.GetObject().transform.GetChild(0).GetComponent<TextMeshPro>().text;
+            name_symbol = cell.transform.GetChild(0).GetComponent<TextMeshPro>().text;
             if (name_symbol == ""|| name_symbol==null) name_symbol = "_";
             StationContent.Base.Table table = Base.SearchSymbol(searchedState, name_symbol, ind_state, ind_symbol);
             if (table != null)
@@ -288,7 +301,7 @@ public class MainGame : MonoBehaviour
                 {
                     overwrite_symbol= null;
                 }
-                this.cell.GoCellAnimation(States.cell_state);
+                GoCellAnimation(States.cell_state);
             }
             else
             {
